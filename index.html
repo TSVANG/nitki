@@ -2,12 +2,24 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Узлы и Точки | Эволюция</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap');
         
+        * {
+            /* Запрет выделения текста и системных меню */
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
@@ -15,11 +27,14 @@
             height: 100%;
             overflow: hidden;
             background-color: #F8FAFC;
-            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
-            background-size: 32px 32px;
+            /* Серо-белый градиент + фоновое изображение (если есть fon.png) */
+            background-image: url('fon.png'), linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: multiply;
             font-family: 'Inter', sans-serif;
-            touch-action: none;
-            user-select: none;
+            touch-action: none; /* Запрет скролла экрана */
         }
 
         #gameCanvas {
@@ -89,15 +104,14 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
 
-        /* Screens */
         .screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(248, 250, 252, 0.9);
-            backdrop-filter: blur(16px);
+            background: rgba(248, 250, 252, 0.85);
+            backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -112,42 +126,59 @@
             visibility: visible;
         }
 
+        /* Адаптивный контейнер меню */
         .menu-container {
             max-width: 1000px;
-            width: 90%;
-            max-height: 95vh;
-            overflow-y: auto;
+            width: 95%;
+            height: 95vh;
+            display: flex;
+            flex-direction: column;
             text-align: center;
-            padding: 40px 0;
-            scrollbar-width: none;
+            padding: 20px 0;
         }
 
         .daily-banner {
             background: linear-gradient(135deg, #F59E0B, #EF4444);
             border-radius: 24px;
-            padding: 24px;
+            padding: 20px;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
             transition: transform 0.2s;
             text-align: left;
+            flex-shrink: 0;
         }
-        .daily-banner:hover { transform: translateY(-5px); }
+        .daily-banner:hover { transform: translateY(-3px); }
         .daily-banner.completed { background: linear-gradient(135deg, #10B981, #059669); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); cursor: default; transform: none; }
 
+        /* Адаптивная сетка карточек */
         .diff-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            flex-grow: 1;
+            align-content: start;
+            overflow-y: auto;
+            padding-bottom: 20px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .diff-cards::-webkit-scrollbar { display: none; } /* Chrome */
+        
+        @media (min-width: 768px) {
+            .diff-cards {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+                align-content: center; /* Центрируем по вертикали на больших экранах */
+            }
         }
 
         .diff-card {
             background: white;
-            padding: 24px;
+            padding: 20px 12px;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.03);
             cursor: pointer;
@@ -167,17 +198,16 @@
         
         .mode-level-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
+            top: 8px;
+            right: 8px;
             background: #F1F5F9;
             color: #64748B;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 8px;
+            padding: 4px 6px;
+            border-radius: 6px;
         }
 
-        /* Achievements Screen */
         .achievements-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -208,7 +238,6 @@
             filter: grayscale(0);
         }
         
-        /* Tiers */
         .ach-tier-common.unlocked { border-color: #CD7F32; background: #FFF3E0; }
         .ach-tier-rare.unlocked { border-color: #94A3B8; background: #F8FAFC; }
         .ach-tier-epic.unlocked { border-color: #FBBF24; background: #FEF3C7; }
@@ -221,7 +250,6 @@
             font-size: 12px;
         }
 
-        /* Progress Bar */
         .xp-bar-bg {
             width: 100%;
             height: 6px;
@@ -238,10 +266,9 @@
             transition: width 0.5s ease-out;
         }
 
-        /* Modals */
         .modal-content {
             background: white;
-            padding: 40px;
+            padding: 32px;
             border-radius: 28px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.1);
             text-align: center;
@@ -250,6 +277,8 @@
             max-width: 400px;
             width: 90%;
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .screen.active .modal-content { transform: scale(1); }
@@ -259,6 +288,8 @@
 
         .btn-danger { background: #EF4444; color: white; border: none; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 16px; }
         .btn-danger:hover { background: #DC2626; transform: translateY(-2px); }
+
+        input[type="range"] { accent-color: #0F172A; cursor: pointer; }
 
         .hint-bar {
             position: absolute;
@@ -270,7 +301,7 @@
         }
         
         .hint-content {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
             padding: 10px 24px;
             border-radius: 99px;
@@ -278,9 +309,9 @@
             color: #475569;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             font-size: 14px;
+            text-align: center;
         }
 
-        /* Toasts Container */
         #toastContainer {
             position: fixed;
             top: 24px;
@@ -319,6 +350,11 @@
 </head>
 <body>
 
+    <!-- Запрет контекстного меню -->
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+
     <canvas id="gameCanvas"></canvas>
 
     <div class="ui-layer">
@@ -336,12 +372,17 @@
             
             <div class="level-info" id="uiLevelIndicator" style="display:none;">Уровень 1</div>
             
-            <div class="flex gap-2">
-                <button class="icon-btn" onclick="game.showAchievements()">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15l-3.5 2 1-4.5L6 9.5l4.5-.5L12 5l1.5 4 4.5.5-3.5 3 1 4.5z"></path></svg>
+            <div class="flex gap-2" id="topNavButtons">
+                <!-- Кнопки в меню -->
+                <button class="icon-btn menu-only" onclick="game.showAchievements()" title="Достижения">
+                    <span class="text-xl">🏅</span>
                 </button>
-                <button class="icon-btn" onclick="game.showMenu()">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <button class="icon-btn menu-only" onclick="game.showSettings()" title="Настройки">
+                    <span class="text-xl">⚙️</span>
+                </button>
+                <!-- Кнопка крестика во время игры -->
+                <button class="icon-btn game-only" onclick="game.showMenu()" title="Меню" style="display: none;">
+                    <span class="text-3xl font-light leading-none mb-1">×</span>
                 </button>
             </div>
         </div>
@@ -353,20 +394,32 @@
 
     <div id="toastContainer"></div>
 
-    <!-- Main Menu -->
     <div id="menuScreen" class="screen active">
         <div class="menu-container">
-            <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-2 tracking-tight">УЗЛЫ И ТОЧКИ</h1>
-            <p class="text-slate-500 mb-8 font-medium tracking-widest text-sm">ЭВОЛЮЦИЯ ГОЛОВОЛОМОК</p>
-            
-            <div id="dailyBanner" class="daily-banner" onclick="game.startDaily()">
-                <div>
-                    <h2 class="text-2xl font-bold mb-1">Ежедневный Вызов</h2>
-                    <p class="text-white/80 text-sm" id="dailySubtext">Пройдите 3 этапа и увеличьте серию</p>
+            <div class="flex-shrink-0">
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-2 tracking-tight">УЗЛЫ И ТОЧКИ</h1>
+                <p class="text-slate-500 mb-6 font-medium tracking-widest text-xs md:text-sm">ЭВОЛЮЦИЯ ГОЛОВОЛОМОК</p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6 max-w-md mx-auto">
+                    <button class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-3 hover:scale-105 transition hover:shadow-md btn-sfx" onclick="game.showAchievements()">
+                        <span class="text-2xl">🏅</span>
+                        <span class="font-bold text-slate-800 text-sm">Достижения</span>
+                    </button>
+                    <button class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-3 hover:scale-105 transition hover:shadow-md btn-sfx" onclick="game.showSettings()">
+                        <span class="text-2xl">⚙️</span>
+                        <span class="font-bold text-slate-800 text-sm">Настройки</span>
+                    </button>
                 </div>
-                <div class="text-right">
-                    <div class="text-4xl font-black mb-1" id="dailyStreak">0 🔥</div>
-                    <div class="text-xs font-bold uppercase tracking-wider text-white/70">Ударный день</div>
+
+                <div id="dailyBanner" class="daily-banner btn-sfx" onclick="game.startDaily()">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-bold mb-1">Ежедневный Вызов</h2>
+                        <p class="text-white/80 text-xs md:text-sm" id="dailySubtext">Пройдите 3 этапа и увеличьте серию</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl md:text-4xl font-black mb-1" id="dailyStreak">0 🔥</div>
+                        <div class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-white/70">Ударный день</div>
+                    </div>
                 </div>
             </div>
 
@@ -374,11 +427,51 @@
         </div>
     </div>
 
+    <!-- Tutorial Screen -->
+    <div id="tutorialScreen" class="screen">
+        <div class="modal-content">
+            <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 mb-4" id="tutTitle">Обучение</h2>
+            <p class="text-slate-600 mb-6 font-medium text-sm leading-relaxed whitespace-pre-line" id="tutText"></p>
+            <button class="btn-primary btn-sfx" onclick="game.closeTutorial()">Понятно, в игру!</button>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settingsScreen" class="screen">
+        <div class="modal-content">
+            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 btn-sfx" onclick="game.showMenu()">
+                <span class="text-3xl">×</span>
+            </button>
+            <h2 class="text-3xl font-black text-slate-900 mb-6">Настройки</h2>
+            
+            <div class="mb-6 text-left">
+                <div class="flex justify-between mb-2">
+                    <label class="font-bold text-slate-700">Музыка (BGM)</label>
+                    <span class="text-slate-500 font-semibold" id="musicValTxt">50%</span>
+                </div>
+                <input type="range" id="musicVol" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="game.updateSetting('music', this.value)">
+            </div>
+            
+            <div class="mb-6 text-left">
+                <div class="flex justify-between mb-2">
+                    <label class="font-bold text-slate-700">Звуки (SFX)</label>
+                    <span class="text-slate-500 font-semibold" id="soundValTxt">50%</span>
+                </div>
+                <input type="range" id="soundVol" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="game.updateSetting('sound', this.value)">
+            </div>
+
+            <button class="btn-primary btn-sfx" onclick="game.showMenu()">Сохранить и закрыть</button>
+        </div>
+    </div>
+
     <!-- Achievements Screen -->
     <div id="achievementsScreen" class="screen">
         <div class="modal-content" style="max-width: 800px;">
-            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800" onclick="game.showMenu()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 btn-sfx" onclick="game.showMenu()">
+                <span class="text-3xl">×</span>
             </button>
             <h2 class="text-3xl font-black text-slate-900 mb-2">Достижения</h2>
             <p class="text-slate-500 mb-6">Ваши награды за мастерство</p>
@@ -396,8 +489,8 @@
             <h2 class="text-3xl font-black text-slate-900 mb-2" id="winTitle">Распутано!</h2>
             <p class="text-slate-500 mb-2" id="winStatsMsg"></p>
             <p class="text-emerald-500 font-bold mb-6 text-xl" id="winXpMsg">+50 XP</p>
-            <button class="btn-primary" id="winNextBtn" onclick="game.nextLevel()">Следующий уровень</button>
-            <button class="w-full mt-4 py-3 text-slate-500 font-semibold hover:text-slate-800 transition" onclick="game.showMenu()">Вернуться в меню</button>
+            <button class="btn-primary btn-sfx" id="winNextBtn" onclick="game.nextLevel()">Следующий уровень</button>
+            <button class="w-full mt-4 py-3 text-slate-500 font-semibold hover:text-slate-800 transition btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>
         </div>
     </div>
 
@@ -409,20 +502,20 @@
             </div>
             <h2 class="text-3xl font-black text-slate-900 mb-2">Катастрофа!</h2>
             <p class="text-slate-600 mb-6 font-medium text-lg" id="loseReasonMsg">Нить порвалась.</p>
-            <button class="btn-danger" onclick="game.restartLevel()">Попробовать снова</button>
-            <button class="w-full mt-4 py-3 text-slate-500 font-semibold hover:text-slate-800 transition" onclick="game.showMenu()">Вернуться в меню</button>
+            <button class="btn-danger btn-sfx" onclick="game.restartLevel()">Попробовать снова</button>
+            <button class="w-full mt-4 py-3 text-slate-500 font-semibold hover:text-slate-800 transition btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>
         </div>
     </div>
 
     <script>
         const MODES = [
-            { id: 'm2', name: 'Путаница', desc: 'Базовый режим.\nРаспутай все линии.', icon: 'M12 4v16m-8-8h16', color: 'text-blue-500', bg: 'bg-blue-100', nodes: 6, edges: 1.3 },
-            { id: 'm3', name: 'Стальной Якорь', desc: 'Некоторые узлы 🔒\nзакреплены намертво.', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', color: 'text-zinc-600', bg: 'bg-zinc-200', nodes: 7, edges: 1.4, fixed: true },
-            { id: 'm4', name: 'Магнитная Буря', desc: '🔴 Отталкивают всё\n🔵 Притягивают всё\nПоле стало огромным', icon: 'M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', color: 'text-purple-500', bg: 'bg-purple-100', nodes: 8, edges: 1.5, magnets: true },
-            { id: 'm5', name: 'Цветная Сеть', desc: '🟩 Зеленые нити-эспандеры.\nЖелтеют и рвутся при натяжении.', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z', color: 'text-emerald-500', bg: 'bg-emerald-100', nodes: 8, edges: 1.5, coloredEdges: true },
-            { id: 'm6', name: 'Хрупкая Связь', desc: 'Черные пунктирные нити рвутся\nпри ЛЮБОМ пересечении!', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', color: 'text-slate-800', bg: 'bg-slate-200', nodes: 9, edges: 1.6, fragile: true },
-            { id: 'm7', name: 'Глухой Лабиринт', desc: 'Узлы и нити не могут\nпроходить сквозь 🧱 стены.', icon: 'M4 4h16v16H4zM4 12h16M12 4v16', color: 'text-stone-700', bg: 'bg-stone-200', nodes: 9, edges: 1.7, walls: true, fixed: true },
-            { id: 'm8', name: 'Абсолютный Хаос', desc: 'Случайные механики!\nС каждым уровнем всё сложнее.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', color: 'text-orange-500', bg: 'bg-orange-100', nodes: 7, edges: 1.4, chaos: true }
+            { id: 'm2', name: 'Путаница', desc: 'Базовый режим.\nРаспутай все линии.', tut: 'Перетаскивайте узлы, чтобы распутать нити.\n\nНи одна нить не должна пересекаться с другой.', icon: 'M12 4v16m-8-8h16', color: 'text-blue-500', bg: 'bg-blue-100', nodes: 6, edges: 1.3 },
+            { id: 'm3', name: 'Стальной Якорь', desc: 'Некоторые узлы 🔒\nзакреплены намертво.', tut: 'Квадратные узлы закреплены намертво. Вы не можете их двигать.\n\nДвигайте обычные круглые узлы вокруг них.', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', color: 'text-zinc-600', bg: 'bg-zinc-200', nodes: 7, edges: 1.4, fixed: true },
+            { id: 'm4', name: 'Магнитная Буря', desc: '🔴 Отталкивают всё\n🔵 Притягивают всё\nПоле стало огромным', tut: 'Узлы стали магнитами!\n\n🔴 Красные отталкивают от себя любые объекты.\n🔵 Синие притягивают к себе.\nБелые узлы не имеют магнитного поля.', icon: 'M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', color: 'text-purple-500', bg: 'bg-purple-100', nodes: 8, edges: 1.5, magnets: true },
+            { id: 'm5', name: 'Цветная Сеть', desc: '🟩 Зеленые нити-эспандеры.\nРвутся при натяжении.', tut: 'Некоторые нити заменены на эластичные эспандеры (зеленые).\n\nОни тянутся хуже. Если натянуть их слишком сильно (желтый/красный цвет) — они порвутся и вы проиграете!', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z', color: 'text-emerald-500', bg: 'bg-emerald-100', nodes: 8, edges: 1.5, coloredEdges: true },
+            { id: 'm6', name: 'Хрупкая Связь', desc: 'Черные пунктирные нити рвутся\nпри ЛЮБОМ пересечении!', tut: 'Черные пунктирные нити очень хрупкие.\n\nВ отличие от обычных нитей, они порвутся в ту же секунду, как только пересекут любую другую нить! Будьте предельно осторожны.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', color: 'text-slate-800', bg: 'bg-slate-200', nodes: 9, edges: 1.6, fragile: true },
+            { id: 'm7', name: 'Глухой Лабиринт', desc: 'Узлы и нити не могут\nпроходить сквозь 🧱 стены.', tut: 'На поле появились серые блоки — стены.\n\nЧерез стены нельзя провести нить и нельзя перетащить узел. Вам придется искать обходные пути.', icon: 'M4 4h16v16H4zM4 12h16M12 4v16', color: 'text-stone-700', bg: 'bg-stone-200', nodes: 9, edges: 1.7, walls: true, fixed: true },
+            { id: 'm8', name: 'Абсолютный Хаос', desc: 'Случайные механики!\nС каждым уровнем всё сложнее.', tut: 'Добро пожаловать в хаос!\n\nЗдесь все мутаторы из других режимов могут появляться одновременно. Чем выше уровень, тем больше механик будет смешано.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', color: 'text-orange-500', bg: 'bg-orange-100', nodes: 7, edges: 1.4, chaos: true }
         ];
 
         const ACHIEVEMENTS = [
@@ -442,20 +535,73 @@
             { id: 'streak_7', name: 'Неделя без перерыва', desc: 'Достичь 7 ударных дней подряд в Ежедневном вызове', icon: '🔥', tier: 'epic', tierIcon: '🥇' },
             { id: 'edge', name: 'На грани', desc: 'Успешно завершить уровень, когда эспандер был натянут на 95%', icon: '📈', tier: 'rare', tierIcon: '🥈' },
             { id: 'chaos', name: 'Спонсор Хаоса', desc: 'Достичь 10 уровня в режиме Абсолютный Хаос', icon: '🌪️', tier: 'rare', tierIcon: '🥈' },
-            { id: 'unbreakable', name: 'Хирург', desc: 'Пройти Хрупкую Связь, не зацепив черную нить', icon: '🧤', tier: 'epic', tierIcon: '🥇' },
-            { id: 'evo_lord', name: 'Повелитель Эволюции', desc: 'Набери во всех режимах (кроме Ежедневного) по 50 уровней', icon: '🌍', tier: 'legendary', tierIcon: '👑' }
+            { id: 'unbreakable', name: 'Хирург', desc: 'Пройти 10 уровней «Хрупкая Связь», не зацепив нить', icon: '🧤', tier: 'epic', tierIcon: '🥇' },
+            { id: 'evo_lord', name: 'Повелитель Эволюции', desc: 'Набери во всех этапах по 50 уровней', icon: '🌍', tier: 'legendary', tierIcon: '👑' }
         ];
+
+        class AudioSystem {
+            constructor() {
+                this.musicPool = ['Cool_Vibes_fon.mp3', 'Walking_Along.mp3'];
+                this.sfxMap = {
+                    win: ['level-win.mp3', 'level-win2.mp3', 'level-win3.mp3'],
+                    lose: ['game-over-1.mp3', 'game-over-2.mp3', 'game-over-3.mp3', 'game-over-4.wav'],
+                    click: ['stone1.mp3'],
+                    snap: ['hlopok2.mp3'],
+                    achieve: ['steam-achievement.mp3']
+                };
+                
+                this.bgm = new Audio();
+                this.bgm.loop = false;
+                this.bgm.addEventListener('ended', () => this.playNextBGM());
+                
+                this.musicVol = 0.5;
+                this.sfxVol = 0.5;
+                this.bgmStarted = false;
+            }
+            
+            updateVolumes(m, s) {
+                this.musicVol = m / 100;
+                this.sfxVol = s / 100;
+                if (this.bgm) this.bgm.volume = this.musicVol;
+            }
+            
+            playNextBGM() {
+                let track = this.musicPool[Math.floor(Math.random() * this.musicPool.length)];
+                this.bgm.src = track;
+                this.bgm.volume = this.musicVol;
+                this.bgm.play().catch(e => console.log('BGM wait interaction'));
+            }
+            
+            startBGM() {
+                if (!this.bgmStarted && this.musicVol > 0) {
+                    this.bgmStarted = true;
+                    this.playNextBGM();
+                }
+            }
+            
+            playSFX(type) {
+                if (this.sfxVol <= 0) return;
+                let list = this.sfxMap[type];
+                if (!list) return;
+                let src = list[Math.floor(Math.random() * list.length)];
+                let a = new Audio(src);
+                a.volume = this.sfxVol;
+                a.play().catch(e => {});
+            }
+        }
 
         class Game {
             constructor() {
                 this.canvas = document.getElementById('gameCanvas');
-                this.ctx = this.canvas.getContext('2d', { alpha: false }); // Optimizing context
+                this.ctx = this.canvas.getContext('2d', { alpha: false }); 
+                this.audio = new AudioSystem();
                 
                 this.state = 'menu';
                 this.currentMode = MODES[0];
                 this.levelNum = 1;
                 this.introFrames = 0; 
                 this.hasInteracted = false; 
+                this.TOP_UI_BOUNDARY = 140; // Невидимая стена сверху
                 
                 this.nodes = [];
                 this.edges = [];
@@ -481,29 +627,67 @@
                 
                 this.setupInputs();
                 this.updateUIPlayer();
+                this.applySettingsToUI();
+                this.bindClickSounds();
                 this.loop();
+                
+                // Start BGM on first global interaction
+                const initAudio = () => {
+                    this.audio.startBGM();
+                    window.removeEventListener('click', initAudio);
+                    window.removeEventListener('touchstart', initAudio);
+                };
+                window.addEventListener('click', initAudio);
+                window.addEventListener('touchstart', initAudio);
+            }
+
+            bindClickSounds() {
+                document.body.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn-sfx') || e.target.closest('.diff-card') || e.target.closest('.icon-btn')) {
+                        this.audio.playSFX('click');
+                    }
+                });
             }
 
             loadPlayer() {
-                let saved = JSON.parse(localStorage.getItem('knots_evo_v5'));
+                let saved = JSON.parse(localStorage.getItem('knots_evo_v8'));
                 if (!saved || !saved.progress) {
                     saved = { 
                         level: 1, xp: 0, progress: {}, 
                         stats: { levelsCompleted: 0, levelsByMode: {} },
                         achievements: {},
-                        daily: { date: '', streak: 0, stagesCompleted: 0 }
+                        tutorialsSeen: {},
+                        daily: { date: '', streak: 0, stagesCompleted: 0 },
+                        settings: { music: 50, sound: 50 }
                     };
                 }
                 if (!saved.stats) saved.stats = { levelsCompleted: 0, levelsByMode: {} };
                 if (!saved.achievements) saved.achievements = {};
+                if (!saved.tutorialsSeen) saved.tutorialsSeen = {};
                 if (!saved.daily) saved.daily = { date: '', streak: 0, stagesCompleted: 0 };
+                if (!saved.settings) saved.settings = { music: 50, sound: 50 };
                 return saved;
             }
             
             savePlayer() {
-                localStorage.setItem('knots_evo_v5', JSON.stringify(this.player));
+                localStorage.setItem('knots_evo_v8', JSON.stringify(this.player));
                 this.updateUIPlayer();
                 if(this.state === 'menu') this.renderMenu();
+            }
+
+            updateSetting(type, val) {
+                this.player.settings[type] = parseInt(val);
+                document.getElementById(`${type}ValTxt`).innerText = `${val}%`;
+                this.audio.updateVolumes(this.player.settings.music, this.player.settings.sound);
+                this.savePlayer();
+            }
+
+            applySettingsToUI() {
+                document.getElementById('musicVol').value = this.player.settings.music;
+                document.getElementById('musicValTxt').innerText = `${this.player.settings.music}%`;
+                document.getElementById('soundVol').value = this.player.settings.sound;
+                document.getElementById('soundValTxt').innerText = `${this.player.settings.sound}%`;
+                this.audio.updateVolumes(this.player.settings.music, this.player.settings.sound);
             }
 
             getMSKDate(offsetDays = 0) {
@@ -517,7 +701,7 @@
                 if (this.player.daily.date !== today) {
                     let yesterday = this.getMSKDate(-1);
                     if (this.player.daily.date !== yesterday || this.player.daily.stagesCompleted < 3) {
-                        this.player.daily.streak = 0;
+                        this.player.daily.streak = 0; // Сгорает серия если пропустил или не доделал
                     }
                     this.player.daily.date = today;
                     this.player.daily.stagesCompleted = 0;
@@ -545,6 +729,12 @@
                 `}).join('');
             }
 
+            showSettings() {
+                this.state = 'settings';
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('settingsScreen').classList.add('active');
+            }
+
             unlockAchievement(id) {
                 if (this.player.achievements[id]) return;
                 
@@ -553,6 +743,8 @@
                 
                 let ach = ACHIEVEMENTS.find(a => a.id === id);
                 if (!ach) return;
+
+                this.audio.playSFX('achieve');
 
                 const t = document.createElement('div');
                 t.className = 'toast';
@@ -596,6 +788,8 @@
                 if ((stats.levelsByMode['m6'] || 0) >= 15) this.unlockAchievement('fire');
                 if ((stats.levelsByMode['m7'] || 0) >= 20) this.unlockAchievement('architect');
                 
+                if ((stats.levelsByMode['m6'] || 0) >= 10) this.unlockAchievement('unbreakable');
+
                 if (this.sessionStreak >= 10) this.unlockAchievement('unstoppable');
                 if (this.sessionStreak >= 50) this.unlockAchievement('addicted');
                 
@@ -603,9 +797,8 @@
                 if (this.highestStretchThisLevel >= 0.95) this.unlockAchievement('edge');
                 if (this.currentMode.chaos && this.levelNum >= 10) this.unlockAchievement('chaos');
                 
-                // Check Global Mastery
                 let masterAll = true;
-                for(let i=1; i<MODES.length; i++) { // From m2 to m8
+                for(let i=0; i<MODES.length; i++) {
                     if ((stats.levelsByMode[MODES[i].id] || 0) < 50) { masterAll = false; break; }
                 }
                 if (masterAll) this.unlockAchievement('evo_lord');
@@ -648,24 +841,28 @@
                 container.innerHTML = MODES.map((m, i) => {
                     let lvl = this.player.progress[m.id] || 1;
                     return `
-                    <div class="diff-card hover:border-${m.color.split('-')[1]}-400" onclick="game.startGame(${i})">
+                    <div class="diff-card hover:border-${m.color.split('-')[1]}-400 btn-sfx" onclick="game.startGame(${i})">
                         <div class="mode-level-badge">Ур. ${lvl}</div>
                         <div class="w-14 h-14 ${m.bg} ${m.color} rounded-2xl flex items-center justify-center mb-4 shadow-inner">
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${m.icon}"></path></svg>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-800 mb-1">${m.name}</h3>
-                        <p class="text-xs text-slate-500 font-medium leading-relaxed whitespace-pre-line">${m.desc}</p>
+                        <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-1">${m.name}</h3>
+                        <p class="text-[10px] md:text-xs text-slate-500 font-medium leading-relaxed whitespace-pre-line">${m.desc}</p>
                     </div>
                 `}).join('');
             }
 
             showMenu() {
                 this.state = 'menu';
-                this.sessionStreak = 0; // Сброс серии
+                this.sessionStreak = 0; 
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('menuScreen').classList.add('active');
                 document.getElementById('uiLevelIndicator').style.display = 'none';
                 document.getElementById('gameHint').style.display = 'none';
+                
+                document.querySelectorAll('.menu-only').forEach(e => e.style.display = 'flex');
+                document.querySelectorAll('.game-only').forEach(e => e.style.display = 'none');
+                
                 this.renderMenu();
             }
 
@@ -673,7 +870,7 @@
                 this.isDaily = false;
                 this.currentMode = MODES[modeIndex];
                 this.levelNum = this.player.progress[this.currentMode.id] || 1;
-                this.startLevel();
+                this.checkTutorialAndStart();
             }
             
             startDaily() {
@@ -686,9 +883,28 @@
                 this.currentMode = { 
                     id: 'daily', name: 'Ежедневный Вызов', 
                     nodes: 5 + (this.dailyStage * 2), 
-                    edges: 1.3 + (this.dailyStage * 0.1) 
+                    edges: 1.3 + (this.dailyStage * 0.1),
+                    tut: 'Добро пожаловать в Ежедневный Вызов!\n\nКаждый день генерируются 3 новых этапа. Механики смешаны! Удачи.'
                 };
                 this.levelNum = this.dailyStage;
+                this.checkTutorialAndStart();
+            }
+
+            checkTutorialAndStart() {
+                if (!this.player.tutorialsSeen[this.currentMode.id]) {
+                    this.state = 'tutorial';
+                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                    document.getElementById('tutTitle').innerText = this.currentMode.name;
+                    document.getElementById('tutText').innerText = this.currentMode.tut;
+                    document.getElementById('tutorialScreen').classList.add('active');
+                } else {
+                    this.startLevel();
+                }
+            }
+
+            closeTutorial() {
+                this.player.tutorialsSeen[this.currentMode.id] = true;
+                this.savePlayer();
                 this.startLevel();
             }
 
@@ -705,7 +921,7 @@
             }
 
             restartLevel() { 
-                this.sessionStreak = 0; // Сброс серии при рестарте
+                this.sessionStreak = 0; 
                 this.startLevel(true); 
             }
 
@@ -741,8 +957,11 @@
             startLevel(isRestart = false) {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 
+                document.querySelectorAll('.menu-only').forEach(e => e.style.display = 'none');
+                document.querySelectorAll('.game-only').forEach(e => e.style.display = 'flex');
+
                 let indicator = document.getElementById('uiLevelIndicator');
-                indicator.innerText = this.isDaily ? `Ежедневный Вызов - Этап ${this.dailyStage}/3` : `${this.currentMode.name} - Ур. ${this.levelNum}`;
+                indicator.innerText = this.isDaily ? `Вызов - Этап ${this.dailyStage}/3` : `${this.currentMode.name} - Ур. ${this.levelNum}`;
                 indicator.style.display = 'block';
                 
                 let hint = document.getElementById('gameHintText');
@@ -850,12 +1069,12 @@
                         let w = isHoriz ? 150 + Math.random()*200 : 30 + Math.random()*20;
                         let h = isHoriz ? 30 + Math.random()*20 : 150 + Math.random()*200;
                         let x = 80 + Math.random() * (this.width - w - 160);
-                        let y = 120 + Math.random() * (this.height - h - 200);
+                        let y = 160 + Math.random() * (this.height - h - 240);
                         this.walls.push({ x, y, w, h });
                     }
                 }
 
-                let padX = 60, padTop = 100, padBot = 80;
+                let padX = 60, padTop = this.TOP_UI_BOUNDARY + 20, padBot = 80;
                 let getRndPos = () => ({
                     x: padX + Math.random()*(this.width - padX*2),
                     y: padTop + Math.random()*(this.height - padTop - padBot)
@@ -910,11 +1129,15 @@
                 this.state = 'playing';
             }
 
-            gameOver(reason) {
+            gameOver(reason, playSnap = false) {
                 if (this.state !== 'playing') return;
                 this.state = 'lose';
                 this.sessionStreak = 0; 
                 this.draggedNode = null;
+                
+                if (playSnap) this.audio.playSFX('snap');
+                this.audio.playSFX('lose');
+
                 document.getElementById('loseReasonMsg').innerText = reason;
                 document.getElementById('loseScreen').classList.add('active');
             }
@@ -950,10 +1173,11 @@
 
                 const onMove = (e) => {
                     if (!this.draggedNode || this.state !== 'playing') return;
-                    e.preventDefault();
+                    e.preventDefault(); // Останавливает нативный скролл на мобильных
                     let p = getP(e);
                     this.draggedNode.targetX = Math.max(this.nodeRadius, Math.min(this.width - this.nodeRadius, p.x));
-                    this.draggedNode.targetY = Math.max(80, Math.min(this.height - this.nodeRadius, p.y));
+                    // Запрет на перетаскивание под верхнюю панель
+                    this.draggedNode.targetY = Math.max(this.TOP_UI_BOUNDARY + this.nodeRadius, Math.min(this.height - this.nodeRadius, p.y));
                 };
 
                 const onUp = () => { this.draggedNode = null; };
@@ -999,11 +1223,39 @@
                 }
 
                 this.nodes.forEach(n => {
-                    // Оптимизация: мгновенная привязка узла к курсору (убирает лаг следования)
                     if (n === this.draggedNode) {
-                        n.x = n.targetX;
-                        n.y = n.targetY;
+                        let dx = n.targetX - n.x;
+                        let dy = n.targetY - n.y;
+                        let dist = Math.hypot(dx, dy);
+                        
+                        let steps = Math.max(1, Math.ceil(dist / 10));
+                        for(let i = 0; i < steps; i++) {
+                            n.x += dx / steps;
+                            n.y += dy / steps;
+                            
+                            if (this.walls.length > 0) {
+                                this.walls.forEach(w => {
+                                    let r = this.nodeRadius + 2;
+                                    let cx = Math.max(w.x, Math.min(n.x, w.x + w.w));
+                                    let cy = Math.max(w.y, Math.min(n.y, w.y + w.h));
+                                    let d = Math.hypot(n.x - cx, n.y - cy);
+                                    
+                                    if (d < r) {
+                                        let overlap = r - d;
+                                        if (d > 0.001) {
+                                            n.x += ((n.x - cx) / d) * overlap;
+                                            n.y += ((n.y - cy) / d) * overlap;
+                                        } else {
+                                            n.y -= overlap;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        
                         n.vx = 0; n.vy = 0;
+                        n.targetX = n.x; 
+                        n.targetY = n.y;
                     } 
                     else if (n.fixed) {
                         n.vx = (n.vx + (n.baseX - n.x) * 0.4) * 0.6;
@@ -1011,7 +1263,8 @@
                         if (Math.abs(n.vx) < 0.1) n.vx = 0; 
                         if (Math.abs(n.vy) < 0.1) n.vy = 0;
                         n.x += n.vx; n.y += n.vy;
-                    } else {
+                    } 
+                    else {
                         let k = 0.3, f = 0.4;
                         n.vx = (n.vx + (n.targetX - n.x) * k) * f;
                         n.vy = (n.vy + (n.targetY - n.y) * k) * f;
@@ -1020,8 +1273,13 @@
                         n.x += n.vx; n.y += n.vy;
                     }
 
-                    // Жесткие столкновения со стенами
-                    if (this.walls.length > 0) {
+                    // Жесткая проверка верхней границы интерфейса для всех свободных узлов
+                    if (n.y < this.TOP_UI_BOUNDARY + this.nodeRadius) {
+                        n.y = this.TOP_UI_BOUNDARY + this.nodeRadius;
+                        n.vy *= -0.5; // Отскок
+                    }
+
+                    if (this.walls.length > 0 && n !== this.draggedNode) {
                         this.walls.forEach(w => {
                             let r = this.nodeRadius + 2;
                             let cx = Math.max(w.x, Math.min(n.x, w.x + w.w));
@@ -1037,10 +1295,7 @@
                                     n.y -= overlap;
                                 }
                                 
-                                if (n === this.draggedNode) {
-                                    n.targetX = n.x; n.targetY = n.y;
-                                }
-                                if (!n.fixed && n !== this.draggedNode) { n.vx *= 0.2; n.vy *= 0.2; }
+                                if (!n.fixed) { n.vx *= 0.2; n.vy *= 0.2; }
                             }
                         });
                     }
@@ -1079,24 +1334,13 @@
             }
 
             draw() {
-                // Очистка с заливкой базового цвета
-                this.ctx.fillStyle = '#F8FAFC';
-                this.ctx.fillRect(0, 0, this.width, this.height);
-                
-                // Рендер точек сетки фона для Canvas (поверх CSS-фона, если нужно)
-                // Но так как canvas прозрачный, мы просто очищаем
                 this.ctx.clearRect(0, 0, this.width, this.height);
 
-                if (this.state === 'menu' || this.state === 'achievements') return;
+                if (this.state === 'menu' || this.state === 'achievements' || this.state === 'settings' || this.state === 'tutorial') return;
                 
                 if (this.introFrames > 0) this.introFrames--;
                 this.updatePhysics();
 
-                // ОПТИМИЗАЦИЯ ТЕНЕЙ: 
-                // ctx.shadowBlur сильно тормозит FPS. 
-                // Заменяем на "фейковые" тени (дублирование отрисовки со смещением).
-
-                // Стены (Тень)
                 this.walls.forEach(w => {
                     this.ctx.fillStyle = 'rgba(0,0,0,0.1)';
                     this.ctx.beginPath();
@@ -1104,7 +1348,6 @@
                     this.ctx.fill();
                 });
                 
-                // Стены (Тело)
                 this.walls.forEach(w => {
                     this.ctx.fillStyle = '#CBD5E1';
                     this.ctx.beginPath();
@@ -1120,7 +1363,7 @@
                 
                 if (this.state === 'playing' && this.hasInteracted) {
                     if (state.activeFragile) {
-                        this.gameOver('Черная пунктирная нить зацепилась!');
+                        this.gameOver('Черная пунктирная нить зацепилась!', true);
                         return;
                     }
                     for (let e of this.edges) {
@@ -1132,15 +1375,16 @@
                             if (ratio > this.highestStretchThisLevel) this.highestStretchThisLevel = ratio;
 
                             if (dist > e.maxLength) {
-                                this.gameOver('Эспандер порвался от сильного натяжения!');
+                                this.gameOver('Эспандер порвался от сильного натяжения!', true);
                                 return;
                             }
                         }
                     }
                 }
 
-                // Линии (Фейковая тень для всех линий)
                 this.ctx.lineCap = 'round';
+                
+                // Отрисовка фейковых теней линий
                 this.edges.forEach((e, i) => {
                     let n1 = this.nodes[e.from], n2 = this.nodes[e.to];
                     let dist = Math.hypot(n1.x-n2.x, n1.y-n2.y);
@@ -1149,7 +1393,7 @@
                     if (sag > 0 && e.type === 'elastic') sag *= 0.5;
 
                     this.ctx.beginPath();
-                    this.ctx.moveTo(n1.x, n1.y + 3); // Смещение тени
+                    this.ctx.moveTo(n1.x, n1.y + 3);
                     if (sag > 0) {
                         this.ctx.quadraticCurveTo((n1.x + n2.x) / 2, (n1.y + n2.y) / 2 + sag + 3, n2.x, n2.y + 3);
                     } else {
@@ -1160,7 +1404,7 @@
                     this.ctx.stroke();
                 });
 
-                // Линии (Тело)
+                // Отрисовка тел линий
                 this.edges.forEach((e, i) => {
                     let n1 = this.nodes[e.from], n2 = this.nodes[e.to];
                     let isInt = state.edgesInt.has(i);
@@ -1185,11 +1429,18 @@
                     } 
                     else if (e.type === 'elastic') {
                         let ratio = Math.min(dist / e.maxLength, 1);
-                        let hue = 140 - (ratio * 120); 
-                        this.ctx.strokeStyle = `hsl(${Math.max(10, hue)}, 80%, 45%)`;
+                        
+                        if (isInt) {
+                            // Обыгрываем пересечение зеленой нити (Эспандера)
+                            this.ctx.strokeStyle = '#F43F5E'; // Красный цвет ошибки
+                            this.ctx.setLineDash([12, 8]); // Пунктир, показывающий напряжение/ошибку
+                        } else {
+                            let hue = 140 - (ratio * 120); 
+                            this.ctx.strokeStyle = `hsl(${Math.max(10, hue)}, 80%, 45%)`;
+                            this.ctx.setLineDash([]);
+                            if (ratio > 0.95 && Math.floor(Date.now() / 100) % 2 === 0) this.ctx.strokeStyle = '#EF4444';
+                        }
                         this.ctx.lineWidth = 6 - (ratio * 3); 
-                        this.ctx.setLineDash([]);
-                        if (ratio > 0.95 && Math.floor(Date.now() / 100) % 2 === 0) this.ctx.strokeStyle = '#EF4444';
                     }
                     else {
                         this.ctx.strokeStyle = isInt ? '#F43F5E' : '#475569';
@@ -1199,7 +1450,6 @@
                     this.ctx.setLineDash([]);
                 });
 
-                // Подсветка узла в руке
                 if (this.draggedNode) {
                     this.ctx.beginPath();
                     this.ctx.arc(this.draggedNode.x, this.draggedNode.y, this.nodeRadius + 12, 0, Math.PI * 2);
@@ -1207,7 +1457,6 @@
                     this.ctx.fill();
                 }
 
-                // Узлы (Фейковая Тень)
                 this.nodes.forEach(n => {
                     this.ctx.fillStyle = 'rgba(0,0,0,0.15)';
                     this.ctx.beginPath();
@@ -1219,7 +1468,6 @@
                     this.ctx.fill();
                 });
 
-                // Узлы (Тело)
                 this.nodes.forEach(n => {
                     if (n.fixed) {
                         this.ctx.beginPath();
@@ -1264,11 +1512,12 @@
                     if (!isMoving && state.invalid === 0 && !state.activeFragile) {
                         this.state = 'won';
                         
+                        this.audio.playSFX('win');
+                        
                         let timeTaken = (Date.now() - this.levelStartTime) / 1000;
                         this.player.stats.levelsCompleted++;
                         this.sessionStreak++;
                         
-                        let isUnbreakableFragile = this.edges.some(e => e.type === 'fragile');
                         let xpBase = 0;
                         
                         if (this.isDaily) {
@@ -1291,7 +1540,6 @@
                         }
                         
                         this.checkAchievements(timeTaken);
-                        if (isUnbreakableFragile && !this.player.achievements['unbreakable']) this.unlockAchievement('unbreakable');
                         
                         let leveled = this.addXp(xpBase);
                         
