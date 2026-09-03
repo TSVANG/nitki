@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Узлы и Точки | Эволюция</title>
+    <!-- Инициализация VK Bridge SDK -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap');
@@ -313,6 +315,43 @@
 
         @keyframes toastEnter { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes toastExit { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-50px); opacity: 0; } }
+
+        /* Стили каталога игр */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .game-card {
+            background: #F8FAFC;
+            border-radius: 12px;
+            padding: 5px; 
+            cursor: pointer;
+            transition: transform 0.1s;
+            border: 2px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-card:hover { border-color: #94A3B8; }
+        .game-card:active { transform: scale(0.95); }
+        .game-img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #E2E8F0;
+            border-radius: 12px; 
+            margin-bottom: 8px;
+            object-fit: cover;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .game-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1E293B;
+            text-align: center;
+            line-height: 1.1;
+        }
     </style>
 </head>
 <body>
@@ -369,14 +408,18 @@
                 <h1 class="text-3xl md:text-5xl font-black text-slate-900 mb-1 md:mb-2 tracking-tight">УЗЛЫ И ТОЧКИ</h1>
                 <p class="text-slate-500 mb-4 md:mb-6 font-medium tracking-widest text-[9px] md:text-sm">ЭВОЛЮЦИЯ ГОЛОВОЛОМОК</p>
                 
-                <div class="grid grid-cols-2 gap-2 md:gap-4 mb-4 md:mb-6 max-w-md mx-auto w-full px-2">
+                <div class="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-6 max-w-md mx-auto w-full px-2">
                     <button class="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-1 md:gap-3 hover:scale-105 transition hover:shadow-md btn-sfx min-w-0" onclick="game.showAchievements()">
                         <span class="text-lg md:text-2xl shrink-0">🏅</span>
-                        <span class="font-bold text-slate-800 text-[10px] sm:text-xs md:text-sm leading-tight truncate">Достижения</span>
+                        <span class="font-bold text-slate-800 text-[9px] sm:text-[11px] md:text-sm leading-tight truncate">Достижения</span>
                     </button>
                     <button class="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-1 md:gap-3 hover:scale-105 transition hover:shadow-md btn-sfx min-w-0" onclick="game.showSettings()">
                         <span class="text-lg md:text-2xl shrink-0">⚙️</span>
-                        <span class="font-bold text-slate-800 text-[10px] sm:text-xs md:text-sm leading-tight truncate">Настройки</span>
+                        <span class="font-bold text-slate-800 text-[9px] sm:text-[11px] md:text-sm leading-tight truncate">Настройки</span>
+                    </button>
+                    <button class="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-1 md:gap-2 hover:scale-105 transition hover:shadow-md btn-sfx min-w-0" onclick="game.showGamesCatalog()">
+                        <span class="text-lg md:text-2xl shrink-0">🎮</span>
+                        <span class="font-bold text-slate-800 text-[9px] sm:text-[11px] md:text-sm leading-tight truncate">Другие<br>Игры</span>
                     </button>
                 </div>
 
@@ -442,6 +485,15 @@
         </div>
     </div>
 
+    <!-- Экран каталога игр -->
+    <div id="gamesCatalogScreen" class="screen">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 btn-sfx" onclick="game.closeGamesCatalog()"><span class="text-3xl">×</span></button>
+            <h2 class="text-3xl font-black text-slate-900 mb-6">🎮 Мои Игры</h2>
+            <div id="games-list" class="games-grid"></div>
+        </div>
+    </div>
+
     <div id="winScreen" class="screen">
         <div class="modal-content">
             <div class="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-6">
@@ -464,16 +516,25 @@
             <p class="text-slate-600 mb-6 font-medium text-lg" id="loseReasonMsg">Нить порвалась.</p>
             <button class="btn-danger btn-sfx" onclick="game.restartLevel()">Попробовать снова</button>
             <button class="w-full mt-4 py-3 text-slate-500 font-semibold hover:text-slate-800 transition btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>
+            <button class="w-full mt-2 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition btn-sfx" onclick="game.showGamesCatalog(true)">🎮 Другие Игры</button>
         </div>
     </div>
 
     <script>
+        const GAMES_CATALOG = [
+            { id: 54053077, name: "Wordle", img: "Wordle.png" }, 
+            { id: 54705661, name: "Виселица", img: "viselitsa.png" },
+            { id: 54051783, name: "Numberzilla", img: "Numberzilla.png" },
+            { id: 54691070, name: "Dune Crash", img: "Dune_Crash.png" },
+            { id: 54692847, name: "67 БЛОКОВ", img: "67_block.png" }
+        ];
+
         const MODES = [
             { id: 'm2', name: 'Путаница', desc: 'Базовый режим.\nРаспутай все линии.', tut: 'Перетаскивайте узлы, чтобы распутать нити.\n\nНи одна нить не должна пересекаться с другой.', icon: 'M12 4v16m-8-8h16', color: 'text-blue-500', bg: 'bg-blue-100', nodes: 6, edges: 1.3 },
             { id: 'm3', name: 'Стальной Якорь', desc: 'Некоторые узлы 🔒\nзакреплены намертво.', tut: 'Квадратные узлы закреплены намертво. Вы не можете их двигать.\n\nДвигайте обычные круглые узлы вокруг них.', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', color: 'text-zinc-600', bg: 'bg-zinc-200', nodes: 7, edges: 1.4, fixed: true },
             { id: 'm4', name: 'Магнитная Буря', desc: '🔴 Отталкивают всё\n🔵 Притягивают всё\nПоле стало огромным', tut: 'Узлы стали магнитами!\n\n🔴 Красные отталкивают от себя любые объекты.\n🔵 Синие притягивают к себе.\nБелые узлы не имеют магнитного поля.', icon: 'M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', color: 'text-purple-500', bg: 'bg-purple-100', nodes: 8, edges: 1.5, magnets: true },
             { id: 'm5', name: 'Цветная Сеть', desc: '🟩 Зеленые нити-эспандеры.\nРвутся при натяжении.', tut: 'Некоторые нити заменены на эластичные эспандеры (зеленые).\n\nОни тянутся хуже. Если натянуть их слишком сильно (желтый/красный цвет) — они порвутся и вы проиграете!', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z', color: 'text-emerald-500', bg: 'bg-emerald-100', nodes: 8, edges: 1.5, coloredEdges: true },
-            { id: 'm6', name: 'Хрупкая Связь', desc: 'Черные пунктирные нити рвутся\nпри ЛЮБОМ пересечении!\nP.S. Нити из 1 узла не пересекаются.', tut: 'Черные пунктирные нити очень хрупкие.\nОни порвутся сразу, как только пересекут любую другую нить!\n\nP.S. Нити, выпущенные из одного узла, не пересекаются.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', color: 'text-slate-800', bg: 'bg-slate-200', nodes: 9, edges: 1.6, fragile: true },
+            { id: 'm6', name: 'Хрупкая Связь', desc: 'Черные пунктирные нити рвутся\nпри ЛЮБОМ пересечении!\nP.S. Нити из 1 узла не пересекаются.', tut: 'Черные пунктирные нити очень хрупкие.\nОни порвутся сразу, как только пересекут любую другую нить!\n\nP.S. Нити из одного узла не пересекаются.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', color: 'text-slate-800', bg: 'bg-slate-200', nodes: 9, edges: 1.6, fragile: true },
             { id: 'm7', name: 'Глухой Лабиринт', desc: 'Узлы и нити не могут\nпроходить сквозь 🧱 стены.', tut: 'На поле появились серые блоки — стены.\n\nЧерез стены нельзя провести нить и нельзя перетащить узел. Вам придется искать обходные пути.', icon: 'M4 4h16v16H4zM4 12h16M12 4v16', color: 'text-stone-700', bg: 'bg-stone-200', nodes: 9, edges: 1.7, walls: true, fixed: true },
             { id: 'm8', name: 'Абсолютный Хаос', desc: 'Случайные механики!\nС каждым уровнем всё сложнее.', tut: 'Добро пожаловать в хаос!\n\nЗдесь все мутаторы из других режимов могут появляться одновременно. Чем выше уровень, тем больше механик будет смешано.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', color: 'text-orange-500', bg: 'bg-orange-100', nodes: 7, edges: 1.4, chaos: true }
         ];
@@ -578,7 +639,8 @@
                 this.levelNum = 1;
                 this.introFrames = 0; 
                 this.hasInteracted = false; 
-                this.TOP_UI_BOUNDARY = 140; // Будет пересчитываться динамически
+                this.TOP_UI_BOUNDARY = 140; 
+                this.BOTTOM_UI_BOUNDARY = 2000; 
                 
                 this.nodes = [];
                 this.edges = [];
@@ -595,6 +657,9 @@
                 this.dragMovesCount = 0;
                 this.sessionStreak = 0;
                 
+                this.isGameOverCatalogFlow = false;
+                this.hasBanner = false; // Флаг рекламного баннера ВК
+
                 this.updateDailyState();
                 
                 this.renderMenu();
@@ -645,7 +710,17 @@
             }
             
             savePlayer() {
-                localStorage.setItem('knots_evo_v8', JSON.stringify(this.player));
+                let dataStr = JSON.stringify(this.player);
+                localStorage.setItem('knots_evo_v8', dataStr);
+                
+                // Синхронизация с ВК
+                if (window.vkBridge) {
+                    vkBridge.send('VKWebAppStorageSet', {
+                        key: 'knots_evo_v8',
+                        value: dataStr
+                    }).catch(e => console.log('VK Save Error:', e));
+                }
+
                 this.updateUIPlayer();
                 if(this.state === 'menu') this.renderMenu();
             }
@@ -681,6 +756,39 @@
                     this.player.daily.date = today;
                     this.player.daily.stagesCompleted = 0;
                     this.savePlayer();
+                }
+            }
+
+            showGamesCatalog(fromGameOver = false) {
+                this.isGameOverCatalogFlow = fromGameOver;
+                this.state = 'catalog'; 
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('gamesCatalogScreen').classList.add('active');
+
+                const list = document.getElementById('games-list');
+                list.innerHTML = '';
+                
+                GAMES_CATALOG.forEach(game => {
+                    const card = document.createElement('div');
+                    card.className = 'game-card btn-sfx';
+                    card.innerHTML = `<img src="${game.img}" class="game-img" alt="${game.name}" onerror="this.style.display='none'"><div class="game-title">${game.name}</div>`;
+                    card.onclick = () => {
+                        if (window.vkBridge) {
+                            vkBridge.send("VKWebAppOpenApp", { app_id: game.id, location: "catalog" })
+                                .catch(error => console.error("App open error:", error));
+                        }
+                    };
+                    list.appendChild(card);
+                });
+            }
+
+            closeGamesCatalog() {
+                if (this.isGameOverCatalogFlow) {
+                    this.state = 'lose';
+                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                    document.getElementById('loseScreen').classList.add('active');
+                } else {
+                    this.showMenu();
                 }
             }
 
@@ -916,11 +1024,13 @@
                 // Динамические границы и размеры под экраны
                 this.nodeRadius = Math.max(14, Math.min(24, this.width / 30));
                 this.TOP_UI_BOUNDARY = Math.max(100, Math.min(150, this.height * 0.18));
+                // Если баннер активен, резервируем 80px снизу
+                this.BOTTOM_UI_BOUNDARY = this.height - (this.hasBanner ? 80 : 20); 
                 
                 if (this.nodes) {
                     this.nodes.forEach(n => {
                         n.x = Math.max(this.nodeRadius + 5, Math.min(this.width - this.nodeRadius - 5, n.x));
-                        n.y = Math.max(this.TOP_UI_BOUNDARY + this.nodeRadius, Math.min(this.height - this.nodeRadius - 5, n.y));
+                        n.y = Math.max(this.TOP_UI_BOUNDARY + this.nodeRadius, Math.min(this.BOTTOM_UI_BOUNDARY - this.nodeRadius, n.y));
                         n.targetX = n.x;
                         n.targetY = n.y;
                     });
@@ -1085,14 +1195,14 @@
                         let w = isHoriz ? this.width * (0.2 + Math.random()*0.3) : minW * (1 + Math.random()*0.5);
                         let h = isHoriz ? minW * (1 + Math.random()*0.5) : this.height * (0.2 + Math.random()*0.3);
                         let x = this.nodeRadius * 3 + Math.random() * (this.width - w - this.nodeRadius * 6);
-                        let y = this.TOP_UI_BOUNDARY + this.nodeRadius * 2 + Math.random() * (this.height - h - this.TOP_UI_BOUNDARY - this.nodeRadius * 5);
+                        let y = this.TOP_UI_BOUNDARY + this.nodeRadius * 2 + Math.random() * (this.BOTTOM_UI_BOUNDARY - h - this.TOP_UI_BOUNDARY - this.nodeRadius * 5);
                         this.walls.push({ x, y, w, h });
                     }
                 }
 
                 let padX = this.nodeRadius * 3;
                 let padTop = this.TOP_UI_BOUNDARY + this.nodeRadius * 2.5;
-                let padBot = this.nodeRadius * 4;
+                let padBot = this.hasBanner ? 100 : this.nodeRadius * 4;
                 let getRndPos = () => ({
                     x: padX + Math.random()*(this.width - padX*2),
                     y: padTop + Math.random()*(this.height - padTop - padBot)
@@ -1217,7 +1327,7 @@
                     e.preventDefault(); 
                     let p = getP(e);
                     this.draggedNode.targetX = Math.max(this.nodeRadius, Math.min(this.width - this.nodeRadius, p.x));
-                    this.draggedNode.targetY = Math.max(this.TOP_UI_BOUNDARY + this.nodeRadius, Math.min(this.height - this.nodeRadius, p.y));
+                    this.draggedNode.targetY = Math.max(this.TOP_UI_BOUNDARY + this.nodeRadius, Math.min(this.BOTTOM_UI_BOUNDARY - this.nodeRadius, p.y));
                 };
 
                 const onUp = () => { 
@@ -1316,9 +1426,16 @@
                         n.x += n.vx; n.y += n.vy;
                     }
 
+                    // Ограничитель сверху
                     if (n.y < this.TOP_UI_BOUNDARY + this.nodeRadius) {
                         n.y = this.TOP_UI_BOUNDARY + this.nodeRadius;
                         n.vy *= -0.5; 
+                    }
+                    
+                    // Ограничитель снизу (защита от попадания под рекламный баннер)
+                    if (n.y > this.BOTTOM_UI_BOUNDARY - this.nodeRadius) {
+                        n.y = this.BOTTOM_UI_BOUNDARY - this.nodeRadius;
+                        n.vy *= -0.5;
                     }
 
                     if (this.walls.length > 0 && n !== this.draggedNode) {
@@ -1419,6 +1536,7 @@
 
                 let state = this.getIntersections();
                 let currentMaxElasticRatio = 0;
+                let isStretchingCurrently = false; // Флаг для звука резины
                 
                 if (this.state === 'playing' && this.hasInteracted) {
                     if (state.activeFragile) {
@@ -1434,6 +1552,11 @@
                             if (ratio > currentMaxElasticRatio) currentMaxElasticRatio = ratio;
                             if (ratio > this.highestStretchThisLevel) this.highestStretchThisLevel = ratio;
 
+                            // Включаем звук резины только если игрок держит этот конкретный узел и растяжение >= 90%
+                            if (this.draggedNode && (this.draggedNode === n1 || this.draggedNode === n2) && ratio >= 0.90) {
+                                isStretchingCurrently = true;
+                            }
+
                             if (dist > e.maxLength) {
                                 this.gameOver('Эспандер порвался от сильного натяжения!', true);
                                 return;
@@ -1442,11 +1565,8 @@
                     }
                 }
 
-                if (this.state === 'playing' && this.draggedNode && currentMaxElasticRatio >= 0.95) {
-                    this.audio.setStretchSound(true);
-                } else {
-                    this.audio.setStretchSound(false);
-                }
+                // Управление звуком натяжения эспандера
+                this.audio.setStretchSound(isStretchingCurrently);
 
                 this.ctx.lineCap = 'round';
                 let lineW = Math.max(2, this.nodeRadius / 4.5);
@@ -1650,6 +1770,23 @@
                         this.checkAchievements(timeTaken);
                         let leveled = this.addXp(xpBase);
                         
+                        // Межстраничная реклама (Interstitial) каждые 7 уровней
+                        this.player.stats.levelsSinceAd = (this.player.stats.levelsSinceAd || 0) + 1;
+                        if (this.player.stats.levelsSinceAd >= 7) {
+                            this.player.stats.levelsSinceAd = 0;
+                            this.savePlayer(); 
+                            if (window.vkBridge) {
+                                vkBridge.send("VKWebAppShowNativeAds", { ad_format: "interstitial" }).catch(e => console.log('Ad error', e));
+                            }
+                        }
+
+                        // Запрос на уведомления после прохождения Ежедневного вызова или первых 3 уровней
+                        if ((this.isDaily && this.player.daily.stagesCompleted === 3) || this.player.stats.levelsCompleted === 3) {
+                            if (window.vkBridge) {
+                                vkBridge.send("VKWebAppAllowNotifications").catch(e => console.log('Notif error', e));
+                            }
+                        }
+                        
                         setTimeout(() => {
                             document.getElementById('winStatsMsg').innerText = this.isDaily ? `Ежедневный вызов (${this.dailyStage}/3)` : `Сложность: ${this.currentMode.name}`;
                             document.getElementById('winXpMsg').innerText = `+${xpBase} XP` + (leveled ? ' (НОВЫЙ УРОВЕНЬ!)' : '');
@@ -1679,7 +1816,41 @@
             }
         });
 
-        window.onload = () => window.game = new Game();
+        // Запуск и синхронизация с VK Cloud Storage
+        window.onload = async () => {
+            window.game = new Game();
+            
+            if (window.vkBridge) {
+                try {
+                    await vkBridge.send('VKWebAppInit');
+                    
+                    // Загрузка прогресса из ВК (Синхронизация между устройствами)
+                    let res = await vkBridge.send('VKWebAppStorageGet', { keys: ['knots_evo_v8'] });
+                    let vkData = res.keys.find(k => k.key === 'knots_evo_v8')?.value;
+                    
+                    if (vkData) {
+                        let parsed = JSON.parse(vkData);
+                        if (parsed && parsed.level) {
+                            window.game.player = parsed;
+                            window.game.updateDailyState();
+                            window.game.savePlayer(); // Перезаписываем localStorage 
+                        }
+                    }
+                    
+                    // Вызов рекламного баннера и адаптация высоты поля
+                    vkBridge.send('VKWebAppShowBannerAd', { banner_location: 'bottom' })
+                        .then(data => { 
+                            if(data.result) {
+                                window.game.hasBanner = true; 
+                                window.game.resize(); // Пересчитываем границы
+                            }
+                        }).catch(() => {});
+
+                } catch(e) {
+                    console.warn("VK API Init/Storage Warning:", e);
+                }
+            }
+        };
     </script>
 </body>
 </html>
