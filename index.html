@@ -9,7 +9,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap');
         
         * {
-            /* Запрет выделения текста и системных меню */
             -webkit-user-select: none;
             -khtml-user-select: none;
             -moz-user-select: none;
@@ -27,14 +26,15 @@
             height: 100%;
             overflow: hidden;
             background-color: #F8FAFC;
-            /* Серо-белый градиент + фоновое изображение (если есть fon.png) */
             background-image: url('fon.png'), linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-blend-mode: multiply;
             font-family: 'Inter', sans-serif;
-            touch-action: none; /* Запрет скролла экрана */
+            touch-action: none; 
+            max-width: 100vw;
+            overflow-x: hidden;
         }
 
         #gameCanvas {
@@ -43,6 +43,7 @@
             top: 0;
             left: 0;
             z-index: 1;
+            touch-action: none;
         }
 
         .ui-layer {
@@ -59,10 +60,12 @@
         }
 
         .top-bar {
-            padding: 24px;
+            padding: env(safe-area-inset-top, 16px) 16px 16px 16px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            gap: 12px;
+            width: 100%;
         }
 
         .player-stats, .level-info, .icon-btn {
@@ -74,21 +77,37 @@
         }
 
         .player-stats {
-            padding: 12px 20px;
-            border-radius: 16px;
-            min-width: 180px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            min-width: 110px;
+            max-width: 40vw;
+        }
+        @media (min-width: 768px) {
+            .player-stats {
+                padding: 12px 20px;
+                border-radius: 16px;
+                min-width: 180px;
+            }
         }
 
         .level-info {
-            padding: 12px 24px;
+            padding: 6px 12px;
             border-radius: 99px;
             font-weight: 600;
             color: #1E293B;
+            pointer-events: auto;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 85vw;
+        }
+        @media (min-width: 768px) {
+            .level-info { padding: 12px 24px; max-width: 50vw; }
         }
 
         .icon-btn {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -102,6 +121,9 @@
             transform: scale(1.05);
             color: #0F172A;
             box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        @media (min-width: 768px) {
+            .icon-btn { width: 48px; height: 48px; }
         }
 
         .screen {
@@ -126,31 +148,37 @@
             visibility: visible;
         }
 
-        /* Адаптивный контейнер меню */
         .menu-container {
             max-width: 1000px;
             width: 95%;
-            height: 95vh;
+            height: 100%;
+            max-height: 100dvh;
             display: flex;
             flex-direction: column;
             text-align: center;
-            padding: 20px 0;
+            padding: max(20px, env(safe-area-inset-top)) 0 max(20px, env(safe-area-inset-bottom)) 0;
+            box-sizing: border-box;
         }
 
         .daily-banner {
             background: linear-gradient(135deg, #F59E0B, #EF4444);
             border-radius: 24px;
-            padding: 20px;
+            padding: 12px 16px;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
             transition: transform 0.2s;
             text-align: left;
             flex-shrink: 0;
+            gap: 8px;
+            overflow: hidden;
+        }
+        @media (min-width: 768px) {
+            .daily-banner { padding: 20px; gap: 16px; margin-bottom: 20px; }
         }
         .daily-banner:hover { transform: translateY(-3px); }
         .daily-banner.completed { background: linear-gradient(135deg, #10B981, #059669); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); cursor: default; transform: none; }
@@ -158,27 +186,29 @@
         /* Адаптивная сетка карточек */
         .diff-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-            flex-grow: 1;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            flex: 1 1 0;
+            min-height: 0;
             align-content: start;
             overflow-y: auto;
-            padding-bottom: 20px;
-            scrollbar-width: none; /* Firefox */
+            padding: 0 8px 20px 8px;
+            scrollbar-width: none;
         }
-        .diff-cards::-webkit-scrollbar { display: none; } /* Chrome */
+        .diff-cards::-webkit-scrollbar { display: none; }
         
-        @media (min-width: 768px) {
+        @media (min-width: 640px) {
             .diff-cards {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
                 gap: 16px;
-                align-content: center; /* Центрируем по вертикали на больших экранах */
+                padding: 0 0 20px 0;
+                align-content: center;
             }
         }
 
         .diff-card {
             background: white;
-            padding: 20px 12px;
+            padding: 16px 8px;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.03);
             cursor: pointer;
@@ -244,27 +274,10 @@
         .ach-tier-legendary.unlocked { border-color: #D946EF; background: linear-gradient(135deg, #FDF4FF, #F3E8FF); }
 
         .ach-icon { font-size: 28px; }
-        .ach-tier-badge {
-            position: absolute;
-            top: 8px; right: 8px;
-            font-size: 12px;
-        }
+        .ach-tier-badge { position: absolute; top: 8px; right: 8px; font-size: 12px; }
 
-        .xp-bar-bg {
-            width: 100%;
-            height: 6px;
-            background: #E2E8F0;
-            border-radius: 99px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-        
-        .xp-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
-            width: 0%;
-            transition: width 0.5s ease-out;
-        }
+        .xp-bar-bg { width: 100%; height: 6px; background: #E2E8F0; border-radius: 99px; margin-top: 8px; overflow: hidden; }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, #3B82F6, #8B5CF6); width: 0%; transition: width 0.5s ease-out; }
 
         .modal-content {
             background: white;
@@ -283,74 +296,26 @@
 
         .screen.active .modal-content { transform: scale(1); }
 
-        .btn-primary { background: #0F172A; color: white; border: none; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 16px; }
+        .btn-primary, .btn-danger { color: white; border: none; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 16px; }
+        .btn-primary { background: #0F172A; }
         .btn-primary:hover { background: #334155; transform: translateY(-2px); }
-
-        .btn-danger { background: #EF4444; color: white; border: none; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 16px; }
+        .btn-danger { background: #EF4444; }
         .btn-danger:hover { background: #DC2626; transform: translateY(-2px); }
 
         input[type="range"] { accent-color: #0F172A; cursor: pointer; }
 
-        .hint-bar {
-            position: absolute;
-            bottom: 24px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            pointer-events: none;
-        }
-        
-        .hint-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            padding: 10px 24px;
-            border-radius: 99px;
-            font-weight: 600;
-            color: #475569;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            font-size: 14px;
-            text-align: center;
-        }
+        .hint-bar { position: absolute; bottom: calc(env(safe-area-inset-bottom, 24px) + 24px); width: 100%; display: flex; justify-content: center; pointer-events: none; }
+        .hint-content { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); padding: 10px 24px; border-radius: 99px; font-weight: 600; color: #475569; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-size: clamp(10px, 3.5vw, 14px); max-width: 90vw; text-align: center; white-space: normal; }
 
-        #toastContainer {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-
-        .toast {
-            background: #1E293B;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 99px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: toastEnter 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        
+        #toastContainer { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: #1E293B; color: white; padding: 12px 24px; border-radius: 99px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: toastEnter 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .toast.hiding { animation: toastExit 0.3s ease-in forwards; }
 
-        @keyframes toastEnter {
-            from { transform: translateY(-100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes toastExit {
-            from { transform: translateY(0); opacity: 1; }
-            to { transform: translateY(-50px); opacity: 0; }
-        }
+        @keyframes toastEnter { from { transform: translateY(-100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes toastExit { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-50px); opacity: 0; } }
     </style>
 </head>
 <body>
-
-    <!-- Запрет контекстного меню -->
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
@@ -358,32 +323,36 @@
     <canvas id="gameCanvas"></canvas>
 
     <div class="ui-layer">
-        <div class="top-bar">
-            <div class="player-stats">
-                <div class="flex justify-between items-end mb-1">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Игрок</span>
-                    <span class="text-lg font-black text-slate-900" id="uiPlayerLevel">Ур. 1</span>
+        <div class="w-full flex flex-col pointer-events-none">
+            <div class="top-bar">
+                <div class="player-stats">
+                    <div class="flex justify-between items-end mb-1 gap-2">
+                        <span class="text-[9px] md:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Игрок</span>
+                        <span class="text-xs md:text-lg font-black text-slate-900 shrink-0" id="uiPlayerLevel">Ур. 1</span>
+                    </div>
+                    <div class="xp-bar-bg"><div class="xp-bar-fill" id="uiXpBar"></div></div>
+                    <div class="text-right mt-1">
+                        <span class="text-[8px] md:text-[10px] font-semibold text-slate-400 truncate block" id="uiXpText">0 / 100 XP</span>
+                    </div>
                 </div>
-                <div class="xp-bar-bg"><div class="xp-bar-fill" id="uiXpBar"></div></div>
-                <div class="text-right mt-1">
-                    <span class="text-[10px] font-semibold text-slate-400" id="uiXpText">0 / 100 XP</span>
+                
+                <div class="flex gap-1 md:gap-2 pointer-events-auto" id="topNavButtons">
+                    <!-- Кнопки в меню -->
+                    <button class="icon-btn menu-only" onclick="game.showAchievements()" title="Достижения">
+                        <span class="text-lg md:text-xl">🏅</span>
+                    </button>
+                    <button class="icon-btn menu-only" onclick="game.showSettings()" title="Настройки">
+                        <span class="text-lg md:text-xl">⚙️</span>
+                    </button>
+                    <!-- Кнопка крестика во время игры -->
+                    <button class="icon-btn game-only" onclick="game.showMenu()" title="Меню" style="display: none;">
+                        <span class="text-2xl md:text-3xl font-light leading-none mb-1">×</span>
+                    </button>
                 </div>
             </div>
             
-            <div class="level-info" id="uiLevelIndicator" style="display:none;">Уровень 1</div>
-            
-            <div class="flex gap-2" id="topNavButtons">
-                <!-- Кнопки в меню -->
-                <button class="icon-btn menu-only" onclick="game.showAchievements()" title="Достижения">
-                    <span class="text-xl">🏅</span>
-                </button>
-                <button class="icon-btn menu-only" onclick="game.showSettings()" title="Настройки">
-                    <span class="text-xl">⚙️</span>
-                </button>
-                <!-- Кнопка крестика во время игры -->
-                <button class="icon-btn game-only" onclick="game.showMenu()" title="Меню" style="display: none;">
-                    <span class="text-3xl font-light leading-none mb-1">×</span>
-                </button>
+            <div class="w-full flex justify-center -mt-2 px-2">
+                <div class="level-info text-[11px] md:text-sm shadow-sm" id="uiLevelIndicator" style="display:none;">Уровень 1</div>
             </div>
         </div>
         
@@ -396,29 +365,29 @@
 
     <div id="menuScreen" class="screen active">
         <div class="menu-container">
-            <div class="flex-shrink-0">
-                <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-2 tracking-tight">УЗЛЫ И ТОЧКИ</h1>
-                <p class="text-slate-500 mb-6 font-medium tracking-widest text-xs md:text-sm">ЭВОЛЮЦИЯ ГОЛОВОЛОМОК</p>
+            <div class="flex-shrink-0 px-2">
+                <h1 class="text-3xl md:text-5xl font-black text-slate-900 mb-1 md:mb-2 tracking-tight">УЗЛЫ И ТОЧКИ</h1>
+                <p class="text-slate-500 mb-4 md:mb-6 font-medium tracking-widest text-[9px] md:text-sm">ЭВОЛЮЦИЯ ГОЛОВОЛОМОК</p>
                 
-                <div class="grid grid-cols-2 gap-4 mb-6 max-w-md mx-auto">
-                    <button class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-3 hover:scale-105 transition hover:shadow-md btn-sfx" onclick="game.showAchievements()">
-                        <span class="text-2xl">🏅</span>
-                        <span class="font-bold text-slate-800 text-sm">Достижения</span>
+                <div class="grid grid-cols-2 gap-2 md:gap-4 mb-4 md:mb-6 max-w-md mx-auto w-full px-2">
+                    <button class="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-1 md:gap-3 hover:scale-105 transition hover:shadow-md btn-sfx min-w-0" onclick="game.showAchievements()">
+                        <span class="text-lg md:text-2xl shrink-0">🏅</span>
+                        <span class="font-bold text-slate-800 text-[10px] sm:text-xs md:text-sm leading-tight truncate">Достижения</span>
                     </button>
-                    <button class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-3 hover:scale-105 transition hover:shadow-md btn-sfx" onclick="game.showSettings()">
-                        <span class="text-2xl">⚙️</span>
-                        <span class="font-bold text-slate-800 text-sm">Настройки</span>
+                    <button class="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center gap-1 md:gap-3 hover:scale-105 transition hover:shadow-md btn-sfx min-w-0" onclick="game.showSettings()">
+                        <span class="text-lg md:text-2xl shrink-0">⚙️</span>
+                        <span class="font-bold text-slate-800 text-[10px] sm:text-xs md:text-sm leading-tight truncate">Настройки</span>
                     </button>
                 </div>
 
                 <div id="dailyBanner" class="daily-banner btn-sfx" onclick="game.startDaily()">
-                    <div>
-                        <h2 class="text-xl md:text-2xl font-bold mb-1">Ежедневный Вызов</h2>
-                        <p class="text-white/80 text-xs md:text-sm" id="dailySubtext">Пройдите 3 этапа и увеличьте серию</p>
+                    <div class="flex-1 pr-2 min-w-0">
+                        <h2 class="text-sm md:text-2xl font-bold mb-0.5 md:mb-1 leading-tight truncate">Ежедневный Вызов</h2>
+                        <p class="text-white/90 text-[9px] md:text-sm leading-tight truncate" id="dailySubtext">Пройдите 3 этапа и увеличьте серию</p>
                     </div>
-                    <div class="text-right">
-                        <div class="text-3xl md:text-4xl font-black mb-1" id="dailyStreak">0 🔥</div>
-                        <div class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-white/70">Ударный день</div>
+                    <div class="text-right shrink-0 pl-1">
+                        <div class="text-lg md:text-4xl font-black mb-0.5 md:mb-1" id="dailyStreak">0 🔥</div>
+                        <div class="text-[7px] md:text-xs font-bold uppercase tracking-wider text-white/70">Ударный день</div>
                     </div>
                 </div>
             </div>
@@ -439,12 +408,9 @@
         </div>
     </div>
 
-    <!-- Settings Screen -->
     <div id="settingsScreen" class="screen">
         <div class="modal-content">
-            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 btn-sfx" onclick="game.showMenu()">
-                <span class="text-3xl">×</span>
-            </button>
+            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 btn-sfx" onclick="game.showMenu()"><span class="text-3xl">×</span></button>
             <h2 class="text-3xl font-black text-slate-900 mb-6">Настройки</h2>
             
             <div class="mb-6 text-left">
@@ -467,20 +433,15 @@
         </div>
     </div>
 
-    <!-- Achievements Screen -->
     <div id="achievementsScreen" class="screen">
         <div class="modal-content" style="max-width: 800px;">
-            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 btn-sfx" onclick="game.showMenu()">
-                <span class="text-3xl">×</span>
-            </button>
+            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 btn-sfx" onclick="game.showMenu()"><span class="text-3xl">×</span></button>
             <h2 class="text-3xl font-black text-slate-900 mb-2">Достижения</h2>
             <p class="text-slate-500 mb-6">Ваши награды за мастерство</p>
-            
             <div class="achievements-grid" id="achievementsContainer"></div>
         </div>
     </div>
 
-    <!-- Win Screen -->
     <div id="winScreen" class="screen">
         <div class="modal-content">
             <div class="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-6">
@@ -494,7 +455,6 @@
         </div>
     </div>
 
-    <!-- Lose Screen -->
     <div id="loseScreen" class="screen">
         <div class="modal-content border-t-8 border-red-500">
             <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -513,7 +473,7 @@
             { id: 'm3', name: 'Стальной Якорь', desc: 'Некоторые узлы 🔒\nзакреплены намертво.', tut: 'Квадратные узлы закреплены намертво. Вы не можете их двигать.\n\nДвигайте обычные круглые узлы вокруг них.', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', color: 'text-zinc-600', bg: 'bg-zinc-200', nodes: 7, edges: 1.4, fixed: true },
             { id: 'm4', name: 'Магнитная Буря', desc: '🔴 Отталкивают всё\n🔵 Притягивают всё\nПоле стало огромным', tut: 'Узлы стали магнитами!\n\n🔴 Красные отталкивают от себя любые объекты.\n🔵 Синие притягивают к себе.\nБелые узлы не имеют магнитного поля.', icon: 'M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242', color: 'text-purple-500', bg: 'bg-purple-100', nodes: 8, edges: 1.5, magnets: true },
             { id: 'm5', name: 'Цветная Сеть', desc: '🟩 Зеленые нити-эспандеры.\nРвутся при натяжении.', tut: 'Некоторые нити заменены на эластичные эспандеры (зеленые).\n\nОни тянутся хуже. Если натянуть их слишком сильно (желтый/красный цвет) — они порвутся и вы проиграете!', icon: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z', color: 'text-emerald-500', bg: 'bg-emerald-100', nodes: 8, edges: 1.5, coloredEdges: true },
-            { id: 'm6', name: 'Хрупкая Связь', desc: 'Черные пунктирные нити рвутся\nпри ЛЮБОМ пересечении!', tut: 'Черные пунктирные нити очень хрупкие.\n\nВ отличие от обычных нитей, они порвутся в ту же секунду, как только пересекут любую другую нить! Будьте предельно осторожны.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', color: 'text-slate-800', bg: 'bg-slate-200', nodes: 9, edges: 1.6, fragile: true },
+            { id: 'm6', name: 'Хрупкая Связь', desc: 'Черные пунктирные нити рвутся\nпри ЛЮБОМ пересечении!\nP.S. Нити из 1 узла не пересекаются.', tut: 'Черные пунктирные нити очень хрупкие.\nОни порвутся сразу, как только пересекут любую другую нить!\n\nP.S. Нити, выпущенные из одного узла, не пересекаются.', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', color: 'text-slate-800', bg: 'bg-slate-200', nodes: 9, edges: 1.6, fragile: true },
             { id: 'm7', name: 'Глухой Лабиринт', desc: 'Узлы и нити не могут\nпроходить сквозь 🧱 стены.', tut: 'На поле появились серые блоки — стены.\n\nЧерез стены нельзя провести нить и нельзя перетащить узел. Вам придется искать обходные пути.', icon: 'M4 4h16v16H4zM4 12h16M12 4v16', color: 'text-stone-700', bg: 'bg-stone-200', nodes: 9, edges: 1.7, walls: true, fixed: true },
             { id: 'm8', name: 'Абсолютный Хаос', desc: 'Случайные механики!\nС каждым уровнем всё сложнее.', tut: 'Добро пожаловать в хаос!\n\nЗдесь все мутаторы из других режимов могут появляться одновременно. Чем выше уровень, тем больше механик будет смешано.', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', color: 'text-orange-500', bg: 'bg-orange-100', nodes: 7, edges: 1.4, chaos: true }
         ];
@@ -554,6 +514,10 @@
                 this.bgm.loop = false;
                 this.bgm.addEventListener('ended', () => this.playNextBGM());
                 
+                this.stretchAudio = new Audio('rezina.mp3');
+                this.stretchAudio.loop = true;
+                this.isStretching = false;
+
                 this.musicVol = 0.5;
                 this.sfxVol = 0.5;
                 this.bgmStarted = false;
@@ -563,6 +527,7 @@
                 this.musicVol = m / 100;
                 this.sfxVol = s / 100;
                 if (this.bgm) this.bgm.volume = this.musicVol;
+                if (this.stretchAudio) this.stretchAudio.volume = this.sfxVol;
             }
             
             playNextBGM() {
@@ -588,6 +553,18 @@
                 a.volume = this.sfxVol;
                 a.play().catch(e => {});
             }
+
+            setStretchSound(playing) {
+                if (this.sfxVol <= 0) playing = false;
+                if (playing && !this.isStretching) {
+                    this.stretchAudio.play().catch(e => {});
+                    this.isStretching = true;
+                } else if (!playing && this.isStretching) {
+                    this.stretchAudio.pause();
+                    this.stretchAudio.currentTime = 0;
+                    this.isStretching = false;
+                }
+            }
         }
 
         class Game {
@@ -601,7 +578,7 @@
                 this.levelNum = 1;
                 this.introFrames = 0; 
                 this.hasInteracted = false; 
-                this.TOP_UI_BOUNDARY = 140; // Невидимая стена сверху
+                this.TOP_UI_BOUNDARY = 140; // Будет пересчитываться динамически
                 
                 this.nodes = [];
                 this.edges = [];
@@ -611,7 +588,6 @@
                 this.draggedNode = null;
                 this.player = this.loadPlayer();
                 
-                // Trackers for Achievements
                 this.isDaily = false;
                 this.dailyStage = 1;
                 this.levelStartTime = 0;
@@ -631,7 +607,6 @@
                 this.bindClickSounds();
                 this.loop();
                 
-                // Start BGM on first global interaction
                 const initAudio = () => {
                     this.audio.startBGM();
                     window.removeEventListener('click', initAudio);
@@ -701,7 +676,7 @@
                 if (this.player.daily.date !== today) {
                     let yesterday = this.getMSKDate(-1);
                     if (this.player.daily.date !== yesterday || this.player.daily.stagesCompleted < 3) {
-                        this.player.daily.streak = 0; // Сгорает серия если пропустил или не доделал
+                        this.player.daily.streak = 0; 
                     }
                     this.player.daily.date = today;
                     this.player.daily.stagesCompleted = 0;
@@ -805,6 +780,7 @@
             }
 
             getXpNeed() { return Math.floor(100 * Math.pow(1.5, this.player.level - 1)); }
+            
             addXp(amount) {
                 this.player.xp += amount;
                 let needed = this.getXpNeed();
@@ -818,6 +794,7 @@
                 this.savePlayer();
                 return leveled;
             }
+            
             updateUIPlayer() {
                 document.getElementById('uiPlayerLevel').innerText = `Ур. ${this.player.level}`;
                 document.getElementById('uiXpBar').style.width = `${(this.player.xp / this.getXpNeed()) * 100}%`;
@@ -843,11 +820,11 @@
                     return `
                     <div class="diff-card hover:border-${m.color.split('-')[1]}-400 btn-sfx" onclick="game.startGame(${i})">
                         <div class="mode-level-badge">Ур. ${lvl}</div>
-                        <div class="w-14 h-14 ${m.bg} ${m.color} rounded-2xl flex items-center justify-center mb-4 shadow-inner">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${m.icon}"></path></svg>
+                        <div class="w-10 h-10 md:w-14 md:h-14 ${m.bg} ${m.color} rounded-xl md:rounded-2xl flex items-center justify-center mb-2 md:mb-4 shadow-inner shrink-0">
+                            <svg width="24" height="24" class="md:w-[28px] md:h-[28px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${m.icon}"></path></svg>
                         </div>
-                        <h3 class="text-sm md:text-lg font-bold text-slate-800 mb-1">${m.name}</h3>
-                        <p class="text-[10px] md:text-xs text-slate-500 font-medium leading-relaxed whitespace-pre-line">${m.desc}</p>
+                        <h3 class="text-[11px] sm:text-xs md:text-lg font-bold text-slate-800 mb-0.5 md:mb-1 leading-tight truncate w-full px-1">${m.name}</h3>
+                        <p class="text-[9px] md:text-xs text-slate-500 font-medium leading-tight whitespace-pre-line">${m.desc}</p>
                     </div>
                 `}).join('');
             }
@@ -855,6 +832,7 @@
             showMenu() {
                 this.state = 'menu';
                 this.sessionStreak = 0; 
+                this.audio.setStretchSound(false);
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('menuScreen').classList.add('active');
                 document.getElementById('uiLevelIndicator').style.display = 'none';
@@ -934,6 +912,19 @@
                 this.canvas.style.width = `${this.width}px`;
                 this.canvas.style.height = `${this.height}px`;
                 this.ctx.scale(dpr, dpr);
+
+                // Динамические границы и размеры под экраны
+                this.nodeRadius = Math.max(14, Math.min(24, this.width / 30));
+                this.TOP_UI_BOUNDARY = Math.max(100, Math.min(150, this.height * 0.18));
+                
+                if (this.nodes) {
+                    this.nodes.forEach(n => {
+                        n.x = Math.max(this.nodeRadius + 5, Math.min(this.width - this.nodeRadius - 5, n.x));
+                        n.y = Math.max(this.TOP_UI_BOUNDARY + this.nodeRadius, Math.min(this.height - this.nodeRadius - 5, n.y));
+                        n.targetX = n.x;
+                        n.targetY = n.y;
+                    });
+                }
             }
 
             ccw(A, B, C) { return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x); }
@@ -943,6 +934,29 @@
                     (Math.abs(B.x-C.x)<tol && Math.abs(B.y-C.y)<tol) || (Math.abs(B.x-D.x)<tol && Math.abs(B.y-D.y)<tol)) return false;
                 return this.ccw(A, C, D) !== this.ccw(B, C, D) && this.ccw(A, B, C) !== this.ccw(A, B, D);
             }
+            
+            getIntersectionPoint(A, B, C, D) {
+                let s1_x = B.x - A.x, s1_y = B.y - A.y;
+                let s2_x = D.x - C.x, s2_y = D.y - C.y;
+                let denom = -s2_x * s1_y + s1_x * s2_y;
+                if (denom === 0) return null;
+                let s = (-s1_y * (A.x - C.x) + s1_x * (A.y - C.y)) / denom;
+                let t = ( s2_x * (A.y - C.y) - s2_y * (A.x - C.x)) / denom;
+                if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+                    return { x: A.x + (t * s1_x), y: A.y + (t * s1_y) };
+                }
+                return null;
+            }
+
+            getLineRectIntersectionPoints(x1, y1, x2, y2, rx, ry, rw, rh) {
+                let pts = [], p, A={x:x1,y:y1}, B={x:x2,y:y2};
+                p = this.getIntersectionPoint(A, B, {x:rx,y:ry}, {x:rx+rw,y:ry}); if(p) pts.push(p);
+                p = this.getIntersectionPoint(A, B, {x:rx+rw,y:ry}, {x:rx+rw,y:ry+rh}); if(p) pts.push(p);
+                p = this.getIntersectionPoint(A, B, {x:rx+rw,y:ry+rh}, {x:rx,y:ry+rh}); if(p) pts.push(p);
+                p = this.getIntersectionPoint(A, B, {x:rx,y:ry+rh}, {x:rx,y:ry}); if(p) pts.push(p);
+                return pts;
+            }
+
             pointInRect(x, y, rx, ry, rw, rh) { return x >= rx && x <= rx+rw && y >= ry && y <= ry+rh; }
             intersectLines(x1, y1, x2, y2, x3, y3, x4, y4) { return this.intersect({x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3}, {x: x4, y: y4}); }
             lineRectIntersect(x1, y1, x2, y2, rx, ry, rw, rh) {
@@ -976,6 +990,7 @@
                 this.levelStartTime = Date.now();
                 this.highestStretchThisLevel = 0;
                 this.dragMovesCount = 0;
+                this.audio.setStretchSound(false);
                 
                 let activeMechs = { fixed: false, magnets: false, coloredEdges: false, fragile: false, walls: false };
                 let numNodes = Math.min(this.currentMode.nodes + Math.floor((this.levelNum - 1) * 0.8), 28);
@@ -1066,31 +1081,43 @@
                     let numWalls = Math.min(2 + Math.floor(this.levelNum / 2), 6);
                     for (let i = 0; i < numWalls; i++) {
                         let isHoriz = Math.random() > 0.5;
-                        let w = isHoriz ? 150 + Math.random()*200 : 30 + Math.random()*20;
-                        let h = isHoriz ? 30 + Math.random()*20 : 150 + Math.random()*200;
-                        let x = 80 + Math.random() * (this.width - w - 160);
-                        let y = 160 + Math.random() * (this.height - h - 240);
+                        let minW = this.nodeRadius * 2;
+                        let w = isHoriz ? this.width * (0.2 + Math.random()*0.3) : minW * (1 + Math.random()*0.5);
+                        let h = isHoriz ? minW * (1 + Math.random()*0.5) : this.height * (0.2 + Math.random()*0.3);
+                        let x = this.nodeRadius * 3 + Math.random() * (this.width - w - this.nodeRadius * 6);
+                        let y = this.TOP_UI_BOUNDARY + this.nodeRadius * 2 + Math.random() * (this.height - h - this.TOP_UI_BOUNDARY - this.nodeRadius * 5);
                         this.walls.push({ x, y, w, h });
                     }
                 }
 
-                let padX = 60, padTop = this.TOP_UI_BOUNDARY + 20, padBot = 80;
+                let padX = this.nodeRadius * 3;
+                let padTop = this.TOP_UI_BOUNDARY + this.nodeRadius * 2.5;
+                let padBot = this.nodeRadius * 4;
                 let getRndPos = () => ({
                     x: padX + Math.random()*(this.width - padX*2),
                     y: padTop + Math.random()*(this.height - padTop - padBot)
                 });
                 let inWall = (x, y) => {
                     for(let w of this.walls) {
-                        if (x > w.x - 30 && x < w.x + w.w + 30 && y > w.y - 30 && y < w.y + w.h + 30) return true;
+                        if (x > w.x - this.nodeRadius*1.5 && x < w.x + w.w + this.nodeRadius*1.5 && 
+                            y > w.y - this.nodeRadius*1.5 && y < w.y + w.h + this.nodeRadius*1.5) return true;
                     }
                     return false;
                 };
 
                 let triesLimit = 500;
                 let tangled = false;
+                let maxElasticDist = Math.max(this.width, this.height) * 0.45;
+                
                 while(triesLimit > 0 && !tangled) {
                     this.nodes.forEach(n => {
-                        let p; do { p = getRndPos(); } while (inWall(p.x, p.y));
+                        let p; 
+                        let wallTries = 0;
+                        do { 
+                            p = getRndPos(); 
+                            wallTries++;
+                        } while (inWall(p.x, p.y) && wallTries < 50);
+                        
                         n.targetX = p.x; n.targetY = p.y;
                         n.baseX = p.x; n.baseY = p.y; 
                         n.x = p.x; n.y = p.y; 
@@ -1109,6 +1136,18 @@
                     }
 
                     if (valid) {
+                        for(let i=0; i<this.edges.length; i++) {
+                            if (this.edges[i].type === 'elastic') {
+                                let n1 = this.nodes[this.edges[i].from], n2 = this.nodes[this.edges[i].to];
+                                if (Math.hypot(n1.x - n2.x, n1.y - n2.y) > maxElasticDist * 0.85) {
+                                    valid = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (valid) {
                         let inters = this.getIntersections();
                         if (inters.invalid > 0) tangled = true;
                     }
@@ -1122,8 +1161,9 @@
                     n.vy = (Math.random() - 0.5) * 40;
                 });
 
+                // Зеленым линиям теперь в 2 раза сложнее тянуться
                 this.edges.forEach(e => {
-                    if(e.type === 'elastic') e.maxLength = Math.max(this.width, this.height) * 0.9; 
+                    if(e.type === 'elastic') e.maxLength = Math.max(this.width, this.height) * 0.45; 
                 });
 
                 this.state = 'playing';
@@ -1134,6 +1174,7 @@
                 this.state = 'lose';
                 this.sessionStreak = 0; 
                 this.draggedNode = null;
+                this.audio.setStretchSound(false);
                 
                 if (playSnap) this.audio.playSFX('snap');
                 this.audio.playSFX('lose');
@@ -1173,14 +1214,16 @@
 
                 const onMove = (e) => {
                     if (!this.draggedNode || this.state !== 'playing') return;
-                    e.preventDefault(); // Останавливает нативный скролл на мобильных
+                    e.preventDefault(); 
                     let p = getP(e);
                     this.draggedNode.targetX = Math.max(this.nodeRadius, Math.min(this.width - this.nodeRadius, p.x));
-                    // Запрет на перетаскивание под верхнюю панель
                     this.draggedNode.targetY = Math.max(this.TOP_UI_BOUNDARY + this.nodeRadius, Math.min(this.height - this.nodeRadius, p.y));
                 };
 
-                const onUp = () => { this.draggedNode = null; };
+                const onUp = () => { 
+                    this.draggedNode = null; 
+                    if (this.audio) this.audio.setStretchSound(false);
+                };
 
                 this.canvas.addEventListener('mousedown', onDown);
                 window.addEventListener('mousemove', onMove, { passive: false });
@@ -1273,10 +1316,9 @@
                         n.x += n.vx; n.y += n.vy;
                     }
 
-                    // Жесткая проверка верхней границы интерфейса для всех свободных узлов
                     if (n.y < this.TOP_UI_BOUNDARY + this.nodeRadius) {
                         n.y = this.TOP_UI_BOUNDARY + this.nodeRadius;
-                        n.vy *= -0.5; // Отскок
+                        n.vy *= -0.5; 
                     }
 
                     if (this.walls.length > 0 && n !== this.draggedNode) {
@@ -1306,6 +1348,7 @@
                 let invalid = 0;
                 let activeFragile = false;
                 let edgesInt = new Set();
+                let intersectionPoints = [];
 
                 for (let i = 0; i < this.edges.length; i++) {
                     let e1 = this.edges[i];
@@ -1313,24 +1356,39 @@
 
                     if (this.walls.length > 0) {
                         for (let w of this.walls) {
-                            if (this.lineRectIntersect(n1.x, n1.y, n2.x, n2.y, w.x, w.y, w.w, w.h)) {
-                                edgesInt.add(i); invalid++; break;
+                            let wallPts = this.getLineRectIntersectionPoints(n1.x, n1.y, n2.x, n2.y, w.x, w.y, w.w, w.h);
+                            if (wallPts.length > 0) {
+                                edgesInt.add(i); invalid++;
+                                wallPts.forEach(pt => intersectionPoints.push({ x: pt.x, y: pt.y, lines: [i] }));
+                            } else if (this.lineRectIntersect(n1.x, n1.y, n2.x, n2.y, w.x, w.y, w.w, w.h)) {
+                                edgesInt.add(i); invalid++;
                             }
                         }
                     }
 
                     for (let j = i + 1; j < this.edges.length; j++) {
                         let e2 = this.edges[j];
+                        
+                        if (e1.type === 'fragile' || e2.type === 'fragile') {
+                            if (e1.from === e2.from || e1.from === e2.to || e1.to === e2.from || e1.to === e2.to) {
+                                continue;
+                            }
+                        }
+
                         let n3 = this.nodes[e2.from], n4 = this.nodes[e2.to];
                         
                         if (this.intersect(n1, n2, n3, n4)) {
                             edgesInt.add(i); edgesInt.add(j);
+                            
+                            let pt = this.getIntersectionPoint(n1, n2, n3, n4);
+                            if (pt) intersectionPoints.push({ x: pt.x, y: pt.y, lines: [i, j] });
+                            
                             if (e1.type === 'fragile' || e2.type === 'fragile') activeFragile = true; 
                             else invalid++;
                         }
                     }
                 }
-                return { invalid, edgesInt, activeFragile };
+                return { invalid, edgesInt, activeFragile, intersectionPoints };
             }
 
             draw() {
@@ -1360,6 +1418,7 @@
                 });
 
                 let state = this.getIntersections();
+                let currentMaxElasticRatio = 0;
                 
                 if (this.state === 'playing' && this.hasInteracted) {
                     if (state.activeFragile) {
@@ -1372,6 +1431,7 @@
                             let dist = Math.hypot(n1.x-n2.x, n1.y-n2.y);
                             let ratio = Math.min(dist / e.maxLength, 1);
                             
+                            if (ratio > currentMaxElasticRatio) currentMaxElasticRatio = ratio;
                             if (ratio > this.highestStretchThisLevel) this.highestStretchThisLevel = ratio;
 
                             if (dist > e.maxLength) {
@@ -1382,14 +1442,21 @@
                     }
                 }
 
+                if (this.state === 'playing' && this.draggedNode && currentMaxElasticRatio >= 0.95) {
+                    this.audio.setStretchSound(true);
+                } else {
+                    this.audio.setStretchSound(false);
+                }
+
                 this.ctx.lineCap = 'round';
+                let lineW = Math.max(2, this.nodeRadius / 4.5);
                 
                 // Отрисовка фейковых теней линий
                 this.edges.forEach((e, i) => {
                     let n1 = this.nodes[e.from], n2 = this.nodes[e.to];
                     let dist = Math.hypot(n1.x-n2.x, n1.y-n2.y);
                     let maxSlackDist = Math.max(this.width, this.height) * 0.45;
-                    let sag = (dist < maxSlackDist) ? (1 - (dist / maxSlackDist)) * (1 - (dist / maxSlackDist)) * 70 : 0;
+                    let sag = (dist < maxSlackDist) ? (1 - (dist / maxSlackDist)) * (1 - (dist / maxSlackDist)) * (this.width*0.05) : 0;
                     if (sag > 0 && e.type === 'elastic') sag *= 0.5;
 
                     this.ctx.beginPath();
@@ -1400,7 +1467,7 @@
                         this.ctx.lineTo(n2.x, n2.y + 3);
                     }
                     this.ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-                    this.ctx.lineWidth = (e.type === 'fragile') ? 3 : 4;
+                    this.ctx.lineWidth = (e.type === 'fragile') ? lineW * 0.75 : lineW;
                     this.ctx.stroke();
                 });
 
@@ -1410,7 +1477,7 @@
                     let isInt = state.edgesInt.has(i);
                     let dist = Math.hypot(n1.x-n2.x, n1.y-n2.y);
                     let maxSlackDist = Math.max(this.width, this.height) * 0.45;
-                    let sag = (dist < maxSlackDist) ? (1 - (dist / maxSlackDist)) * (1 - (dist / maxSlackDist)) * 70 : 0;
+                    let sag = (dist < maxSlackDist) ? (1 - (dist / maxSlackDist)) * (1 - (dist / maxSlackDist)) * (this.width*0.05) : 0;
                     if (sag > 0 && e.type === 'elastic') sag *= 0.5;
 
                     this.ctx.beginPath();
@@ -1421,33 +1488,72 @@
                         this.ctx.lineTo(n2.x, n2.y);
                     }
                     
-                    this.ctx.lineWidth = 4;
+                    this.ctx.lineWidth = lineW;
                     if (e.type === 'fragile') {
                         this.ctx.strokeStyle = isInt ? '#EF4444' : '#1E293B'; 
                         this.ctx.setLineDash([10, 6]);
-                        this.ctx.lineWidth = 3;
+                        this.ctx.lineWidth = lineW * 0.75;
+                        this.ctx.stroke();
+                        this.ctx.setLineDash([]);
                     } 
                     else if (e.type === 'elastic') {
                         let ratio = Math.min(dist / e.maxLength, 1);
                         
-                        if (isInt) {
-                            // Обыгрываем пересечение зеленой нити (Эспандера)
-                            this.ctx.strokeStyle = '#F43F5E'; // Красный цвет ошибки
-                            this.ctx.setLineDash([12, 8]); // Пунктир, показывающий напряжение/ошибку
-                        } else {
-                            let hue = 140 - (ratio * 120); 
-                            this.ctx.strokeStyle = `hsl(${Math.max(10, hue)}, 80%, 45%)`;
-                            this.ctx.setLineDash([]);
-                            if (ratio > 0.95 && Math.floor(Date.now() / 100) % 2 === 0) this.ctx.strokeStyle = '#EF4444';
+                        let hue = 140 - (ratio * 120); 
+                        this.ctx.strokeStyle = `hsl(${Math.max(10, hue)}, 80%, 45%)`;
+                        if (ratio > 0.95 && Math.floor(Date.now() / 100) % 2 === 0) this.ctx.strokeStyle = '#EF4444';
+                        
+                        this.ctx.lineWidth = (lineW * 1.5) - (ratio * lineW * 0.8); 
+                        this.ctx.stroke();
+
+                        // Красные отрезки на местах пересечения зеленой нити (теперь без пунктира!)
+                        if (isInt && state.intersectionPoints) {
+                            let pts = state.intersectionPoints.filter(p => p.lines.includes(i));
+                            if (pts.length > 0) {
+                                let markW = ((lineW * 1.5) - (ratio * lineW * 0.8)) * 1.5;
+                                let baseCol = `hsl(${Math.max(10, hue)}, 80%, 45%)`;
+                                
+                                pts.forEach(p => {
+                                    let dx = n2.x - n1.x, dy = n2.y - n1.y;
+                                    let len = Math.hypot(dx, dy);
+                                    let t = len > 0 ? Math.hypot(p.x - n1.x, p.y - n1.y) / len : 0;
+                                    
+                                    let cpX = (n1.x + n2.x) / 2;
+                                    let cpY = (n1.y + n2.y) / 2 + sag;
+                                    
+                                    let cx = Math.pow(1-t, 2)*n1.x + 2*(1-t)*t*cpX + Math.pow(t, 2)*n2.x;
+                                    let cy = Math.pow(1-t, 2)*n1.y + 2*(1-t)*t*cpY + Math.pow(t, 2)*n2.y;
+                                    
+                                    let tx = 2*(1-t)*(cpX - n1.x) + 2*t*(n2.x - cpX);
+                                    let ty = 2*(1-t)*(cpY - n1.y) + 2*t*(n2.y - cpY);
+                                    let angle = Math.atan2(ty, tx);
+                                    
+                                    let segLen = this.nodeRadius * 1.5;
+                                    
+                                    let sx = cx - Math.cos(angle)*segLen;
+                                    let sy = cy - Math.sin(angle)*segLen;
+                                    let ex = cx + Math.cos(angle)*segLen;
+                                    let ey = cy + Math.sin(angle)*segLen;
+                                    
+                                    let grad = this.ctx.createLinearGradient(sx, sy, ex, ey);
+                                    grad.addColorStop(0, baseCol);
+                                    grad.addColorStop(0.5, '#EF4444');
+                                    grad.addColorStop(1, baseCol);
+                                    
+                                    this.ctx.beginPath();
+                                    this.ctx.moveTo(sx, sy);
+                                    this.ctx.lineTo(ex, ey);
+                                    this.ctx.strokeStyle = grad;
+                                    this.ctx.lineWidth = markW;
+                                    this.ctx.stroke();
+                                });
+                            }
                         }
-                        this.ctx.lineWidth = 6 - (ratio * 3); 
                     }
                     else {
                         this.ctx.strokeStyle = isInt ? '#F43F5E' : '#475569';
-                        this.ctx.setLineDash([]);
+                        this.ctx.stroke();
                     }
-                    this.ctx.stroke();
-                    this.ctx.setLineDash([]);
                 });
 
                 if (this.draggedNode) {
@@ -1475,14 +1581,15 @@
                         this.ctx.fillStyle = '#1E293B';
                         this.ctx.fill();
                         this.ctx.strokeStyle = '#475569';
-                        this.ctx.lineWidth = 3;
+                        this.ctx.lineWidth = Math.max(2, this.nodeRadius / 6);
                         this.ctx.stroke();
                         
+                        let pd = this.nodeRadius / 2.5;
                         this.ctx.fillStyle = 'white';
-                        this.ctx.fillRect(n.x-4, n.y-2, 8, 8);
+                        this.ctx.fillRect(n.x-pd, n.y-pd/2, pd*2, pd*2);
                         this.ctx.beginPath();
-                        this.ctx.arc(n.x, n.y-2, 4, Math.PI, 0);
-                        this.ctx.strokeStyle = 'white'; this.ctx.lineWidth=2; this.ctx.stroke();
+                        this.ctx.arc(n.x, n.y-pd/2, pd, Math.PI, 0);
+                        this.ctx.strokeStyle = 'white'; this.ctx.lineWidth=Math.max(1.5, this.nodeRadius/10); this.ctx.stroke();
                     } 
                     else {
                         this.ctx.beginPath();
@@ -1494,12 +1601,13 @@
                         
                         this.ctx.fill();
                         
-                        this.ctx.lineWidth = 3;
+                        this.ctx.lineWidth = Math.max(2, this.nodeRadius / 6);
                         this.ctx.strokeStyle = (n.type !== 'normal') ? '#FFFFFF' : '#1E293B';
                         this.ctx.stroke();
 
                         this.ctx.fillStyle = (n.type !== 'normal') ? '#FFFFFF' : '#1E293B';
-                        this.ctx.font = '700 16px Inter, sans-serif';
+                        let fSize = Math.max(10, this.nodeRadius * 0.7);
+                        this.ctx.font = `700 ${fSize}px Inter, sans-serif`;
                         this.ctx.textAlign = 'center';
                         this.ctx.textBaseline = 'middle';
                         this.ctx.fillText((n.id + 1).toString(), n.x, n.y + 1);
@@ -1540,7 +1648,6 @@
                         }
                         
                         this.checkAchievements(timeTaken);
-                        
                         let leveled = this.addXp(xpBase);
                         
                         setTimeout(() => {
@@ -1557,6 +1664,20 @@
                 requestAnimationFrame(() => this.loop());
             }
         }
+
+        // Выключение звука и музыки при сворачивании окна/игры
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (window.game && window.game.audio) {
+                    window.game.audio.bgm.pause();
+                    window.game.audio.setStretchSound(false);
+                }
+            } else {
+                if (window.game && window.game.audio && window.game.audio.bgmStarted && window.game.audio.musicVol > 0) {
+                    window.game.audio.bgm.play().catch(e => {});
+                }
+            }
+        });
 
         window.onload = () => window.game = new Game();
     </script>
