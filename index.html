@@ -28,11 +28,10 @@
             height: 100%;
             overflow: hidden;
             background-color: #F8FAFC;
-            background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(226,232,240,0.85) 100%), url('fon.png');
+            background-image: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
             font-family: 'Inter', sans-serif;
             touch-action: none; 
             max-width: 100vw;
@@ -473,12 +472,22 @@
             </div>
 
             <div class="mb-6 mt-4">
-                <button class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:scale-105 transition btn-sfx relative group" onclick="game.buyPremium()">
-                    💎 Отключить рекламу и открыть всё
+                <button id="premiumBtn" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:scale-105 transition btn-sfx relative group" onclick="game.buyPremium()">
+                    💎 Отключить рекламу
                     <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 text-white text-[11px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl leading-tight text-center">
-                        Убирает баннер и межстраничную рекламу, а также повышает прогресс во всех режимах до 50 уровня!
+                        Убирает баннер снизу и всю всплывающую межстраничную рекламу в игре.
                     </div>
                 </button>
+            </div>
+
+            <div class="mb-6 mt-4 p-4 bg-slate-200 rounded-xl border border-slate-300 text-left">
+                <h3 class="font-bold text-slate-800 mb-2 text-sm">Панель Тестировщика</h3>
+                <button class="w-full bg-red-500 hover:bg-red-600 text-white rounded p-2 mb-3 font-bold text-sm transition btn-sfx" onclick="game.resetProgress()">Обнулить прогресс</button>
+                <div class="flex gap-2">
+                    <select id="testMode" class="flex-1 p-2 rounded border border-slate-300 text-sm font-semibold"></select>
+                    <input type="number" id="testLevel" class="w-16 p-2 rounded border border-slate-300 text-center text-sm font-semibold" value="1" min="1">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white rounded p-2 font-bold text-sm transition btn-sfx" onclick="game.setTestLevel()">OK</button>
+                </div>
             </div>
 
             <button class="btn-primary btn-sfx" onclick="game.showMenu()">Сохранить и закрыть</button>
@@ -535,7 +544,7 @@
             { id: 54705661, name: "Виселица", img: "viselitsa.png" },
             { id: 54051783, name: "Numberzilla", img: "Numberzilla.png" },
             { id: 54691070, name: "Dune Crash", img: "Dune_Crash.png" },
-        //    { id: 54692847, name: "67 БЛОКОВ", img: "67_block.png" }
+            { id: 54692847, name: "67 БЛОКОВ", img: "67_block.png" }
         ];
 
         const MODES = [
@@ -743,11 +752,8 @@
             }
 
             buyPremium() {
+                if (this.player.isPremium) return;
                 this.player.isPremium = true;
-                
-                MODES.forEach(m => {
-                    this.player.progress[m.id] = Math.max(this.player.progress[m.id] || 1, 50);
-                });
                 this.savePlayer();
 
                 if (window.vkBridge) {
@@ -756,11 +762,72 @@
                 this.hasBanner = false;
                 this.resize();
                 
+                this.updatePremiumButton();
+
                 let t = document.createElement('div');
                 t.className = 'toast';
-                t.innerHTML = `<div class="text-3xl">💎</div><div><div class="text-sm font-bold uppercase tracking-widest text-[#FBBF24]">ПРЕМИУМ</div><div class="text-xs font-semibold">Реклама отключена, уровни открыты!</div></div>`;
+                t.innerHTML = `<div class="text-3xl">💎</div><div><div class="text-sm font-bold uppercase tracking-widest text-[#FBBF24]">ПРЕМИУМ</div><div class="text-xs font-semibold">Реклама полностью отключена!</div></div>`;
                 document.getElementById('toastContainer').appendChild(t);
                 setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 300); }, 3000);
+            }
+
+            resetProgress() {
+                localStorage.removeItem('knots_evo_v8');
+                if (window.vkBridge) {
+                    vkBridge.send('VKWebAppStorageSet', { key: 'knots_evo_v8', value: '' }).catch(e=>console.log(e));
+                }
+                this.player = this.loadPlayer();
+                this.savePlayer();
+                
+                this.showMenu();
+                this.updatePremiumButton();
+                
+                let t = document.createElement('div');
+                t.className = 'toast';
+                t.innerHTML = `<div>Прогресс сброшен</div>`;
+                document.getElementById('toastContainer').appendChild(t);
+                setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 300); }, 2000);
+                
+                // Запрашиваем уведомления, словно это новый игрок
+                if (window.vkBridge) {
+                    vkBridge.send('VKWebAppAllowNotifications')
+                    .then((data) => { 
+                        if (data.result) { this.player.notifAllowed = true; this.savePlayer(); }
+                    })
+                    .catch((error) => console.log(error));
+                }
+            }
+
+            setTestLevel() {
+                let modeId = document.getElementById('testMode').value;
+                let lvl = parseInt(document.getElementById('testLevel').value);
+                if (lvl > 0 && modeId) {
+                    this.player.progress[modeId] = lvl;
+                    this.savePlayer();
+                    this.showMenu();
+                    let t = document.createElement('div');
+                    t.className = 'toast';
+                    t.innerHTML = `<div>Уровень ${lvl} установлен!</div>`;
+                    document.getElementById('toastContainer').appendChild(t);
+                    setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 300); }, 2000);
+                }
+            }
+
+            updatePremiumButton() {
+                const btn = document.getElementById('premiumBtn');
+                if (!btn) return;
+                if (this.player.isPremium) {
+                    btn.className = "w-full bg-slate-400 text-white font-bold py-3 px-4 rounded-xl cursor-not-allowed";
+                    btn.innerHTML = "💎 Реклама отключена";
+                    btn.onclick = null;
+                } else {
+                    btn.className = "w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:scale-105 transition btn-sfx relative group";
+                    btn.innerHTML = `💎 Отключить рекламу
+                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 text-white text-[11px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl leading-tight text-center">
+                        Убирает баннер снизу и всю всплывающую межстраничную рекламу в игре.
+                    </div>`;
+                    btn.onclick = () => this.buyPremium();
+                }
             }
 
             checkNotificationsRequest() {
@@ -882,6 +949,18 @@
                 this.state = 'settings';
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('settingsScreen').classList.add('active');
+                
+                this.updatePremiumButton();
+                
+                let select = document.getElementById('testMode');
+                if (select && select.children.length === 0) {
+                    MODES.forEach(m => {
+                        let opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.innerText = m.name;
+                        select.appendChild(opt);
+                    });
+                }
             }
 
             unlockAchievement(id) {
@@ -1286,6 +1365,8 @@
                 if (activeMechs.roamers) {
                     let pool = getNormalNodes();
                     let count = Math.min(Math.max(1, Math.floor(numNodes * 0.15)), pool.length);
+                    if (this.currentMode.chaos || this.isDaily) count = Math.min(count, 1); // Максимум 1 искра в Хаосе
+                    count = Math.min(count, 4); // Максимум 4 искры вообще
                     pool.sort(() => 0.5 - Math.random()).slice(0, count).forEach(n => {
                         n.type = 'roamer';
                         n.roamAngle = Math.random() * Math.PI * 2;
@@ -1355,23 +1436,22 @@
                     let valid = true;
 
                     // === ПРОВЕРКА ДЛЯ КОЛЮЧЕК (МИН) ===
-                    // Колючки не должны появляться вплотную к нитям или другим кругам
                     if (valid && activeMechs.mines) {
                         for (let m of this.nodes) {
                             if (m.type === 'mine') {
-                                // 1. Проверка дистанции до других узлов
+                                // 1. Проверка дистанции до других узлов (увеличено для безопасности)
                                 for (let o of this.nodes) {
-                                    if (m !== o && Math.hypot(m.x - o.x, m.y - o.y) < this.nodeRadius * 3) {
+                                    if (m !== o && Math.hypot(m.x - o.x, m.y - o.y) < this.nodeRadius * 4.5) {
                                         valid = false; break;
                                     }
                                 }
                                 if (!valid) break;
                                 
-                                // 2. Проверка дистанции до линий
+                                // 2. Проверка дистанции до линий (увеличено для безопасности)
                                 for (let e of this.edges) {
                                     if (e.from === m.id || e.to === m.id) continue;
                                     let n1 = this.nodes[e.from], n2 = this.nodes[e.to];
-                                    if (this.distToSegment(m, n1, n2) < this.nodeRadius * 2.5) {
+                                    if (this.distToSegment(m, n1, n2) < this.nodeRadius * 4) {
                                         valid = false; break;
                                     }
                                 }
@@ -1380,6 +1460,23 @@
                         }
                     }
                     // ===================================
+
+                    if (valid) {
+                        for(let i=0; i<this.edges.length; i++) {
+                            for(let j=i+1; j<this.edges.length; j++) {
+                                let e1 = this.edges[i], e2 = this.edges[j];
+                                if (e1.type === 'fragile' || e2.type === 'fragile') {
+                                    // Пропускаем смежные грани, чтобы не было ложного пересечения в самом узле
+                                    if (e1.from === e2.from || e1.from === e2.to || e1.to === e2.from || e1.to === e2.to) continue;
+                                    
+                                    let n1 = this.nodes[e1.from], n2 = this.nodes[e1.to];
+                                    let n3 = this.nodes[e2.from], n4 = this.nodes[e2.to];
+                                    if (this.intersect(n1, n2, n3, n4)) { valid = false; break; }
+                                }
+                            }
+                            if (!valid) break;
+                        }
+                    }
 
                     // === ПРОВЕРКА НЕПРОХОДИМЫХ СТЕН ===
                     // Если два заблокированных блока соединены линией, и она проходит сквозь стену — уровень не пройти!
@@ -1618,10 +1715,11 @@
                         n.roamAngle = n.roamAngle || Math.random() * Math.PI * 2;
                         n.roamAngle += (Math.random() - 0.5) * 0.2; 
                         
-                        // === СКОРОСТЬ БЛУЖДАЮЩИХ ИСКР ===
-                        // Измените значение roamSpeed, чтобы ускорить или замедлить узлы (1.0 - быстро, 0.2 - в 5 раз медленнее)
+                        let roamerCount = this.nodes.filter(rn => rn.type === 'roamer').length;
                         let roamSpeed = 0.02; 
-                        // ================================
+                        if (roamerCount === 2) roamSpeed = 0.01;
+                        if (roamerCount === 3) roamSpeed = 0.007;
+                        if (roamerCount >= 4) roamSpeed = 0.005;
 
                         n.targetX = n.x + Math.cos(n.roamAngle) * roamSpeed * 15;
                         n.targetY = n.y + Math.sin(n.roamAngle) * roamSpeed * 15;
