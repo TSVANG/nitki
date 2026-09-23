@@ -36,7 +36,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #E2E8F0; /* Приглушенный серый для светлой темы */
+            background-color: #E2E8F0;
             background-image: url('fon.png'), linear-gradient(135deg, #E2E8F0 0%, #CBD5E1 100%);
             background-size: cover, cover;
             background-position: center, center;
@@ -53,7 +53,6 @@
             background-image: url('fon_black.png'), linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
         }
 
-        /* Адаптация кастомных компонентов под тёмную тему */
         .dark .player-stats, .dark .level-info, .dark .icon-btn {
             background: rgba(30, 41, 59, 0.95);
             border-color: rgba(51, 65, 85, 0.8);
@@ -65,7 +64,7 @@
         
         .dark .screen { background: rgba(15, 23, 42, 0.85); }
         .dark .diff-card { background: #1E293B; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .dark .diff-card:hover { box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        .dark .diff-card:not(.locked-card):hover { box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
         .dark .mode-level-badge { background: #334155; color: #94A3B8; }
         
         .dark .ach-card { background: #1E293B; border-color: #334155; color: white; }
@@ -74,7 +73,13 @@
         .dark .ach-tier-epic.unlocked { border-color: #FBBF24; background: rgba(251, 191, 36, 0.1); }
         .dark .ach-tier-legendary.unlocked { border-color: #D946EF; background: rgba(217, 70, 239, 0.1); }
         
-        .dark .modal-content { background: #1E293B; color: white; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        /* Улучшенный контраст модальных окон в темной теме */
+        .dark .modal-content { 
+            background: #94A3B8; 
+            color: #0F172A; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5); 
+        }
+        
         .dark .hint-content { background: rgba(30, 41, 59, 0.95); color: #CBD5E1; }
         
         .dark .game-card { background: #1E293B; border-color: #334155; }
@@ -116,7 +121,7 @@
         }
 
         .player-stats, .level-info, .icon-btn {
-            background: rgba(241, 245, 249, 0.95); /* Серый оттенок для светлой темы */
+            background: rgba(241, 245, 249, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(203, 213, 225, 0.8);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -130,11 +135,7 @@
             max-width: 40vw;
         }
         @media (min-width: 768px) {
-            .player-stats {
-                padding: 12px 20px;
-                border-radius: 16px;
-                min-width: 180px;
-            }
+            .player-stats { padding: 12px 20px; border-radius: 16px; min-width: 180px; }
         }
 
         .level-info {
@@ -164,14 +165,8 @@
             color: #475569;
         }
 
-        .icon-btn:hover {
-            transform: scale(1.05);
-            color: #0F172A;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        }
-        @media (min-width: 768px) {
-            .icon-btn { width: 48px; height: 48px; }
-        }
+        .icon-btn:hover { transform: scale(1.05); color: #0F172A; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+        @media (min-width: 768px) { .icon-btn { width: 48px; height: 48px; } }
 
         .screen {
             position: absolute;
@@ -179,7 +174,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(226, 232, 240, 0.85); /* Приглушенный фон экранов */
+            background: rgba(226, 232, 240, 0.85);
             backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
@@ -190,10 +185,7 @@
             transition: all 0.3s ease;
         }
 
-        .screen.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .screen.active { opacity: 1; visibility: visible; }
 
         .menu-container {
             max-width: 1000px;
@@ -205,27 +197,27 @@
             text-align: center;
             padding: max(20px, env(safe-area-inset-top)) 0 max(20px, env(safe-area-inset-bottom)) 0;
             box-sizing: border-box;
+            overflow-y: auto; 
+            overflow-x: hidden;
+            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: none; /* Firefox */
         }
+        .menu-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
         .daily-banner {
             background: linear-gradient(135deg, #F59E0B, #EF4444);
             border-radius: 24px;
-            padding: 12px 16px;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
             transition: transform 0.2s;
             text-align: left;
-            flex-shrink: 0;
+            flex-shrink: 0; 
             gap: 8px;
             overflow: hidden;
-        }
-        @media (min-width: 768px) {
-            .daily-banner { padding: 20px; gap: 16px; margin-bottom: 20px; }
         }
         .daily-banner:hover { transform: translateY(-3px); }
         .daily-banner.completed { background: linear-gradient(135deg, #10B981, #059669); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); cursor: default; transform: none; }
@@ -234,26 +226,20 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
-            flex: 1 1 0;
-            min-height: 0;
-            align-content: start;
-            overflow-y: auto;
-            padding: 0 8px 20px 8px;
-            scrollbar-width: none;
+            padding: 0 8px 40px 8px; /* Запас снизу */
         }
-        .diff-cards::-webkit-scrollbar { display: none; }
         
         @media (min-width: 640px) {
             .diff-cards {
                 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
                 gap: 16px;
-                padding: 0 0 20px 0;
-                align-content: center;
+                padding: 0 0 40px 0;
+                justify-content: center;
             }
         }
 
         .diff-card {
-            background: #F1F5F9; /* Сероватый вместо белого */
+            background: #F1F5F9; 
             padding: 16px 8px;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.03);
@@ -267,11 +253,20 @@
             position: relative;
         }
 
-        .diff-card:hover {
+        .diff-card:not(.locked-card):hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.08);
         }
         
+        .locked-card {
+            filter: grayscale(1);
+            opacity: 0.85;
+            cursor: default;
+            pointer-events: none; /* Запрещаем клики на заблокированном уровне */
+            border: 2px dashed #CBD5E1;
+        }
+        .dark .locked-card { border-color: #475569; }
+
         .mode-level-badge {
             position: absolute;
             top: 8px;
@@ -309,10 +304,7 @@
             position: relative;
             overflow: hidden;
         }
-        .ach-card.unlocked {
-            opacity: 1;
-            filter: grayscale(0);
-        }
+        .ach-card.unlocked { opacity: 1; filter: grayscale(0); }
         
         .ach-icon { font-size: 28px; }
         .ach-tier-badge { position: absolute; top: 8px; right: 8px; font-size: 12px; }
@@ -356,44 +348,15 @@
         @keyframes toastExit { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-50px); opacity: 0; } }
 
         /* Стили каталога игр */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .game-card {
-            background: #F1F5F9;
-            border-radius: 12px;
-            padding: 5px; 
-            cursor: pointer;
-            transition: transform 0.1s;
-            border: 2px solid #E2E8F0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .game-card { background: #F1F5F9; border-radius: 12px; padding: 5px; cursor: pointer; transition: transform 0.1s; border: 2px solid #E2E8F0; display: flex; flex-direction: column; align-items: center; }
         .game-card:hover { border-color: #94A3B8; }
         .game-card:active { transform: scale(0.95); }
-        .game-img {
-            width: 100%;
-            aspect-ratio: 1/1;
-            background: #E2E8F0;
-            border-radius: 12px; 
-            margin-bottom: 8px;
-            object-fit: cover;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .game-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #1E293B;
-            text-align: center;
-            line-height: 1.1;
-        }
+        .game-img { width: 100%; aspect-ratio: 1/1; background: #E2E8F0; border-radius: 12px; margin-bottom: 8px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .game-title { font-size: 11px; font-weight: 700; color: #1E293B; text-align: center; line-height: 1.1; }
     </style>
 </head>
-<body class="dark">
+<body>
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
@@ -441,31 +404,33 @@
 
     <div id="menuScreen" class="screen active">
         <div class="menu-container">
-            <div class="flex-shrink-0 px-2">
-                <h1 class="text-3xl md:text-5xl font-black text-slate-700 dark:text-white mb-1 md:mb-2 tracking-tight">УЗЛЫ И ТОЧКИ</h1>
-                <p class="text-slate-500 dark:text-slate-400 mb-4 md:mb-6 font-medium tracking-widest text-[9px] md:text-sm">ЭВОЛЮЦИЯ ГОЛОВОЛОМОК</p>
+            <div class="px-2 w-full">
+                <!-- Заголовки и тексты теперь динамически уменьшаются на узких по высоте экранах через clamp() -->
+                <h1 class="font-black text-slate-700 dark:text-white tracking-tight leading-none" style="font-size: clamp(28px, 6vh, 48px); margin-bottom: clamp(4px, 1.5vh, 8px);">УЗЛЫ И ТОЧКИ</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium tracking-widest text-[9px] md:text-sm" style="margin-bottom: clamp(12px, 3vh, 24px);">ЭВОЛЮЦИЯ ГОЛОВОЛОМОК</p>
                 
-                <!-- Компактные кнопки без текста, с полупрозрачными иконками в светлой теме -->
-                <div class="flex justify-center gap-4 mb-4 md:mb-6 mx-auto w-full px-2">
-                    <button class="bg-[#F1F5F9] dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:scale-105 transition hover:shadow-md btn-sfx aspect-square w-16 h-16 md:w-20 md:h-20" onclick="game.showAchievements()">
-                        <span class="text-3xl md:text-4xl opacity-60 dark:opacity-100">🏅</span>
+                <!-- Блок кнопок настроек (динамические ширина и высота через clamp) -->
+                <div class="flex justify-center gap-4 mx-auto w-full px-2" style="margin-bottom: clamp(12px, 3vh, 24px);">
+                    <button class="bg-[#F1F5F9] dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:scale-105 transition hover:shadow-md btn-sfx aspect-square" style="width: clamp(52px, 11vh, 80px); height: clamp(52px, 11vh, 80px);" onclick="game.showAchievements()">
+                        <span class="opacity-60 dark:opacity-100" style="font-size: clamp(24px, 5vh, 36px);">🏅</span>
                     </button>
-                    <button class="bg-[#F1F5F9] dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:scale-105 transition hover:shadow-md btn-sfx aspect-square w-16 h-16 md:w-20 md:h-20" onclick="game.showSettings()">
-                        <span class="text-3xl md:text-4xl opacity-60 dark:opacity-100">⚙️</span>
+                    <button class="bg-[#F1F5F9] dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:scale-105 transition hover:shadow-md btn-sfx aspect-square" style="width: clamp(52px, 11vh, 80px); height: clamp(52px, 11vh, 80px);" onclick="game.showSettings()">
+                        <span class="opacity-60 dark:opacity-100" style="font-size: clamp(24px, 5vh, 36px);">⚙️</span>
                     </button>
-                    <button class="bg-[#F1F5F9] dark:bg-slate-800 p-4 md:p-5 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:scale-105 transition hover:shadow-md btn-sfx aspect-square w-16 h-16 md:w-20 md:h-20" onclick="game.showGamesCatalog()">
-                        <span class="text-3xl md:text-4xl opacity-60 dark:opacity-100">🎮</span>
+                    <button class="bg-[#F1F5F9] dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:scale-105 transition hover:shadow-md btn-sfx aspect-square" style="width: clamp(52px, 11vh, 80px); height: clamp(52px, 11vh, 80px);" onclick="game.showGamesCatalog()">
+                        <span class="opacity-60 dark:opacity-100" style="font-size: clamp(24px, 5vh, 36px);">🎮</span>
                     </button>
                 </div>
 
-                <div id="dailyBanner" class="daily-banner btn-sfx" onclick="game.startDaily()">
+                <!-- Ежедневный баннер (адаптивные отступы и шрифты) -->
+                <div id="dailyBanner" class="daily-banner btn-sfx" style="padding: clamp(10px, 2.5vh, 20px); margin-bottom: clamp(12px, 3vh, 24px);" onclick="game.startDaily()">
                     <div class="flex-1 pr-2 min-w-0">
-                        <h2 class="text-sm md:text-2xl font-bold mb-0.5 md:mb-1 leading-tight truncate">Ежедневный Вызов</h2>
-                        <p class="text-white/90 text-[9px] md:text-sm leading-tight truncate" id="dailySubtext">Пройдите 3 этапа и увеличьте серию</p>
+                        <h2 class="font-bold leading-tight truncate" style="font-size: clamp(14px, 3vh, 24px); margin-bottom: clamp(2px, 0.5vh, 4px);">Ежедневный Вызов</h2>
+                        <p class="text-white/90 leading-tight truncate" style="font-size: clamp(9px, 1.8vh, 14px);" id="dailySubtext">Пройдите 3 этапа и увеличьте серию</p>
                     </div>
                     <div class="text-right shrink-0 pl-1">
-                        <div class="text-lg md:text-4xl font-black mb-0.5 md:mb-1" id="dailyStreak">0 🔥</div>
-                        <div class="text-[7px] md:text-xs font-bold uppercase tracking-wider text-white/70">Ударный день</div>
+                        <div class="font-black" id="dailyStreak" style="font-size: clamp(18px, 4.5vh, 36px); margin-bottom: clamp(2px, 0.5vh, 4px);">0 🔥</div>
+                        <div class="font-bold uppercase tracking-wider text-white/70" style="font-size: clamp(7px, 1.5vh, 12px);">Ударный день</div>
                     </div>
                 </div>
             </div>
@@ -480,8 +445,9 @@
             <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
             </div>
-            <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-4" id="tutTitle">Обучение</h2>
-            <p class="text-slate-600 dark:text-slate-300 mb-6 font-medium text-sm leading-relaxed whitespace-pre-line" id="tutText"></p>
+            <!-- Убраны dark:text-... классы, чтобы в темной теме на светлом фоне модалки текст оставался читаемым -->
+            <h2 class="text-2xl font-black text-slate-900 mb-4" id="tutTitle">Обучение</h2>
+            <p class="text-slate-800 mb-6 font-medium text-sm leading-relaxed whitespace-pre-line" id="tutText"></p>
             <button class="btn-primary btn-sfx" onclick="game.closeTutorial()">Понятно, в игру!</button>
         </div>
     </div>
@@ -489,14 +455,13 @@
     <!-- Settings Screen -->
     <div id="settingsScreen" class="screen">
         <div class="modal-content">
-            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 dark:hover:text-white btn-sfx" onclick="game.showMenu()"><span class="text-3xl">×</span></button>
-            <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-6">Настройки</h2>
+            <button class="absolute top-6 right-6 text-slate-500 hover:text-slate-900 btn-sfx" onclick="game.showMenu()"><span class="text-3xl">×</span></button>
+            <h2 class="text-3xl font-black text-slate-900 mb-6">Настройки</h2>
             
-            <!-- Тема Оформления -->
             <div class="mb-6 text-left">
                 <div class="flex justify-between mb-2">
-                    <label class="font-bold text-slate-700 dark:text-slate-300">Тема оформления</label>
-                    <span class="text-slate-500 dark:text-slate-400 font-semibold" id="themeValTxt">Тёмная</span>
+                    <label class="font-bold text-slate-800">Тема оформления</label>
+                    <span class="text-slate-700 font-semibold" id="themeValTxt">Светлая</span>
                 </div>
                 <div class="flex gap-2">
                     <button id="themeLightBtn" class="flex-1 py-2 rounded-lg border-2 font-bold transition btn-sfx" onclick="game.updateTheme('light')">Светлая</button>
@@ -506,21 +471,20 @@
 
             <div class="mb-6 text-left">
                 <div class="flex justify-between mb-2">
-                    <label class="font-bold text-slate-700 dark:text-slate-300">Музыка</label>
-                    <span class="text-slate-500 dark:text-slate-400 font-semibold" id="musicValTxt">50%</span>
+                    <label class="font-bold text-slate-800">Музыка</label>
+                    <span class="text-slate-700 font-semibold" id="musicValTxt">50%</span>
                 </div>
-                <input type="range" id="musicVol" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="game.updateSetting('music', this.value)">
+                <input type="range" id="musicVol" min="0" max="100" value="50" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer" oninput="game.updateSetting('music', this.value)">
             </div>
             
             <div class="mb-6 text-left">
                 <div class="flex justify-between mb-2">
-                    <label class="font-bold text-slate-700 dark:text-slate-300">Звуки</label>
-                    <span class="text-slate-500 dark:text-slate-400 font-semibold" id="soundValTxt">50%</span>
+                    <label class="font-bold text-slate-800">Звуки</label>
+                    <span class="text-slate-700 font-semibold" id="soundValTxt">50%</span>
                 </div>
-                <input type="range" id="soundVol" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="game.updateSetting('sound', this.value)">
+                <input type="range" id="soundVol" min="0" max="100" value="50" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer" oninput="game.updateSetting('sound', this.value)">
             </div>
 
-            <!-- Premium Button (Hidden) -->
             <div class="mb-6 mt-4" style="display: none;">
                 <button id="premiumBtn" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:scale-105 transition btn-sfx relative group" onclick="game.buyPremium()">
                     💎 Отключить рекламу
@@ -530,13 +494,12 @@
                 </button>
             </div>
 
-            <!-- Tester Panel (Hidden) -->
-            <div class="mb-6 mt-4 p-4 bg-slate-200 dark:bg-slate-700 rounded-xl border border-slate-300 dark:border-slate-600 text-left" style="display: none;">
-                <h3 class="font-bold text-slate-800 dark:text-white mb-2 text-sm">Панель Тестировщика</h3>
+            <div class="mb-6 mt-4 p-4 bg-slate-300 rounded-xl border border-slate-400 text-left" style="display: none;">
+                <h3 class="font-bold text-slate-900 mb-2 text-sm">Панель Тестировщика</h3>
                 <button class="w-full bg-red-500 hover:bg-red-600 text-white rounded p-2 mb-3 font-bold text-sm transition btn-sfx" onclick="game.resetProgress()">Обнулить прогресс</button>
                 <div class="flex gap-2">
-                    <select id="testMode" class="flex-1 p-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-sm font-semibold"></select>
-                    <input type="number" id="testLevel" class="w-16 p-2 rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white text-center text-sm font-semibold" value="1" min="1">
+                    <select id="testMode" class="flex-1 p-2 rounded border border-slate-400 bg-white text-slate-900 text-sm font-semibold"></select>
+                    <input type="number" id="testLevel" class="w-16 p-2 rounded border border-slate-400 bg-white text-slate-900 text-center text-sm font-semibold" value="1" min="1">
                     <button class="bg-blue-500 hover:bg-blue-600 text-white rounded p-2 font-bold text-sm transition btn-sfx" onclick="game.setTestLevel()">OK</button>
                 </div>
             </div>
@@ -548,9 +511,9 @@
     <!-- Achievements Screen -->
     <div id="achievementsScreen" class="screen">
         <div class="modal-content" style="max-width: 800px;">
-            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 dark:hover:text-white btn-sfx" onclick="game.showMenu()"><span class="text-3xl">×</span></button>
-            <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-2">Достижения</h2>
-            <p class="text-slate-500 dark:text-slate-400 mb-6">Ваши награды за мастерство</p>
+            <button class="absolute top-6 right-6 text-slate-500 hover:text-slate-900 btn-sfx" onclick="game.showMenu()"><span class="text-3xl">×</span></button>
+            <h2 class="text-3xl font-black text-slate-900 mb-2">Достижения</h2>
+            <p class="text-slate-700 mb-6 font-medium">Ваши награды за мастерство</p>
             <div class="achievements-grid" id="achievementsContainer"></div>
         </div>
     </div>
@@ -558,8 +521,8 @@
     <!-- Games Catalog Screen -->
     <div id="gamesCatalogScreen" class="screen">
         <div class="modal-content" style="max-width: 600px;">
-            <button class="absolute top-6 right-6 text-slate-400 hover:text-slate-800 dark:hover:text-white btn-sfx" onclick="game.closeGamesCatalog()"><span class="text-3xl">×</span></button>
-            <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-6">🎮 Мои Игры</h2>
+            <button class="absolute top-6 right-6 text-slate-500 hover:text-slate-900 btn-sfx" onclick="game.closeGamesCatalog()"><span class="text-3xl">×</span></button>
+            <h2 class="text-3xl font-black text-slate-900 mb-6">🎮 Мои Игры</h2>
             <div id="games-list" class="games-grid"></div>
         </div>
     </div>
@@ -569,11 +532,12 @@
             <div class="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
-            <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-2" id="winTitle">Распутано!</h2>
-            <p class="text-slate-500 dark:text-slate-400 mb-2" id="winStatsMsg"></p>
-            <p class="text-emerald-500 font-bold mb-6 text-xl" id="winXpMsg">+50 XP</p>
-            <button class="btn-primary btn-sfx" id="winNextBtn" onclick="game.nextLevel()">Следующий уровень</button>
-            <button class="w-full mt-4 py-3 text-slate-500 dark:text-slate-400 font-semibold hover:text-slate-800 dark:hover:text-white transition btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>
+            <h2 class="text-3xl font-black text-slate-900 mb-2" id="winTitle">Распутано!</h2>
+            <p class="text-slate-800 mb-2 font-semibold" id="winStatsMsg"></p>
+            <p class="text-emerald-700 font-bold mb-6 text-xl" id="winXpMsg">+50 XP</p>
+            
+            <!-- Контейнер для динамических кнопок победы -->
+            <div id="winBtnsContainer" class="w-full flex flex-col gap-2"></div>
         </div>
     </div>
 
@@ -582,11 +546,11 @@
             <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M15 9l-6 6"></path></svg>
             </div>
-            <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-2">Катастрофа!</h2>
-            <p class="text-slate-600 dark:text-slate-300 mb-6 font-medium text-lg" id="loseReasonMsg">Нить порвалась.</p>
+            <h2 class="text-3xl font-black text-slate-900 mb-2">Катастрофа!</h2>
+            <p class="text-slate-800 mb-6 font-semibold text-lg" id="loseReasonMsg">Нить порвалась.</p>
             <button class="btn-danger btn-sfx" onclick="game.restartLevel()">Попробовать снова</button>
-            <button class="w-full mt-4 py-3 text-slate-500 dark:text-slate-400 font-semibold hover:text-slate-800 dark:hover:text-white transition btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>
-            <button class="w-full mt-2 py-3 bg-[#E2E8F0] dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition btn-sfx" onclick="game.showGamesCatalog(true)">🎮 Другие Игры</button>
+            <button class="w-full mt-4 py-3 text-slate-700 font-bold hover:text-slate-900 transition btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>
+            <button class="w-full mt-2 py-3 bg-[#E2E8F0] text-slate-800 rounded-xl font-bold hover:bg-slate-300 transition btn-sfx" onclick="game.showGamesCatalog(true)">🎮 Другие Игры</button>
         </div>
     </div>
 
@@ -756,7 +720,7 @@
 
             bindClickSounds() {
                 document.body.addEventListener('click', (e) => {
-                    if (e.target.closest('.btn-sfx') || e.target.closest('.diff-card') || e.target.closest('.icon-btn')) {
+                    if (e.target.closest('.btn-sfx') || e.target.closest('.diff-card:not(.locked-card)') || e.target.closest('.icon-btn')) {
                         this.audio.playSFX('click');
                     }
                 });
@@ -771,7 +735,7 @@
                         achievements: {},
                         tutorialsSeen: {},
                         daily: { date: '', streak: 0, stagesCompleted: 0 },
-                        settings: { music: 50, sound: 50, theme: 'dark' }, // По умолчанию - темная
+                        settings: { music: 50, sound: 50, theme: 'light' }, // Белая тема со старта
                         notifAllowed: false,
                         isPremium: false
                     };
@@ -783,9 +747,8 @@
                 if (!saved.tutorialsSeen) saved.tutorialsSeen = {};
                 if (!saved.daily) saved.daily = { date: '', streak: 0, stagesCompleted: 0 };
                 
-                // Всегда задаем темную тему, если настройки сброшены или отсутствуют
-                if (!saved.settings) saved.settings = { music: 50, sound: 50, theme: 'dark' };
-                if (!saved.settings.theme) saved.settings.theme = 'dark';
+                if (!saved.settings) saved.settings = { music: 50, sound: 50, theme: 'light' };
+                if (!saved.settings.theme) saved.settings.theme = 'light';
                 
                 if (saved.notifAllowed === undefined) saved.notifAllowed = false;
                 if (saved.isPremium === undefined) saved.isPremium = false;
@@ -1031,7 +994,7 @@
                         <div class="ach-icon">${ach.icon}</div>
                         <div>
                             <h4 class="font-bold text-slate-900 dark:text-white">${ach.name}</h4>
-                            <p class="text-xs text-slate-500 dark:text-slate-400">${ach.desc}</p>
+                            <p class="text-xs text-slate-700 dark:text-slate-300 font-medium">${ach.desc}</p>
                         </div>
                     </div>
                 `}).join('');
@@ -1162,16 +1125,49 @@
                 const container = document.getElementById('modesContainer');
                 container.innerHTML = MODES.map((m, i) => {
                     let lvl = this.player.progress[m.id] || 1;
-                    return `
-                    <div class="diff-card hover:border-${m.color.split('-')[1]}-400 btn-sfx" onclick="game.startGame(${i})">
-                        <div class="mode-level-badge">Ур. ${lvl}</div>
-                        <div class="w-10 h-10 md:w-14 md:h-14 ${m.bg} ${m.color} rounded-xl md:rounded-2xl flex items-center justify-center mb-2 md:mb-4 shadow-inner shrink-0">
-                            <svg width="24" height="24" class="md:w-[28px] md:h-[28px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${m.icon}"></path></svg>
+                    
+                    let isLocked = false;
+                    let levelsLeft = 0;
+                    
+                    if (i > 0) {
+                        let prevModeId = MODES[i-1].id;
+                        let prevLvl = this.player.progress[prevModeId] || 1;
+                        if (prevLvl < 15) {
+                            isLocked = true;
+                            levelsLeft = 15 - prevLvl;
+                        }
+                    }
+
+                    if (isLocked) {
+                        return `
+                        <div class="diff-card locked-card">
+                            <div class="mode-level-badge bg-slate-700 !text-white flex items-center gap-1">
+                                <span>🔒</span> Закрыто
+                            </div>
+                            <div class="w-10 h-10 md:w-14 md:h-14 ${m.bg} ${m.color} rounded-xl md:rounded-2xl flex items-center justify-center mb-2 md:mb-4 shadow-inner shrink-0 opacity-50">
+                                <svg width="24" height="24" class="md:w-[28px] md:h-[28px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${m.icon}"></path></svg>
+                            </div>
+                            <h3 class="text-[11px] sm:text-xs md:text-lg font-bold text-slate-800 dark:text-white mb-0.5 md:mb-1 leading-tight truncate w-full px-1">${m.name}</h3>
+                            <p class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-medium leading-tight whitespace-pre-line">${m.desc}</p>
+                            
+                            <div class="mt-2 text-[9px] md:text-xs font-bold text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded-lg w-full text-center border border-red-200 dark:border-red-800/50">
+                                Осталось: ${levelsLeft} ур.
+                            </div>
                         </div>
-                        <h3 class="text-[11px] sm:text-xs md:text-lg font-bold text-slate-800 dark:text-white mb-0.5 md:mb-1 leading-tight truncate w-full px-1">${m.name}</h3>
-                        <p class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-medium leading-tight whitespace-pre-line">${m.desc}</p>
-                    </div>
-                `}).join('');
+                        `;
+                    } else {
+                        return `
+                        <div class="diff-card hover:border-${m.color.split('-')[1]}-400 btn-sfx" onclick="game.startGame(${i})">
+                            <div class="mode-level-badge">Ур. ${lvl}</div>
+                            <div class="w-10 h-10 md:w-14 md:h-14 ${m.bg} ${m.color} rounded-xl md:rounded-2xl flex items-center justify-center mb-2 md:mb-4 shadow-inner shrink-0">
+                                <svg width="24" height="24" class="md:w-[28px] md:h-[28px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="${m.icon}"></path></svg>
+                            </div>
+                            <h3 class="text-[11px] sm:text-xs md:text-lg font-bold text-slate-800 dark:text-white mb-0.5 md:mb-1 leading-tight truncate w-full px-1">${m.name}</h3>
+                            <p class="text-[9px] md:text-xs text-slate-500 dark:text-slate-400 font-medium leading-tight whitespace-pre-line">${m.desc}</p>
+                        </div>
+                        `;
+                    }
+                }).join('');
             }
 
             showMenu() {
@@ -1196,6 +1192,11 @@
                 this.checkTutorialAndStart();
             }
             
+            startGameById(modeId) {
+                let idx = MODES.findIndex(m => m.id === modeId);
+                if (idx >= 0) this.startGame(idx);
+            }
+
             startDaily() {
                 this.updateDailyState();
                 if (this.player.daily.stagesCompleted >= 3) return; 
@@ -1229,18 +1230,6 @@
                 this.player.tutorialsSeen[this.currentMode.id] = true;
                 this.savePlayer();
                 this.startLevel();
-            }
-
-            nextLevel() {
-                if (this.isDaily) {
-                    if (this.dailyStage < 3) this.startDaily();
-                    else this.showMenu();
-                } else {
-                    this.levelNum++;
-                    this.player.progress[this.currentMode.id] = this.levelNum;
-                    this.savePlayer();
-                    this.startLevel();
-                }
             }
 
             restartLevel() { 
@@ -2207,6 +2196,7 @@
                     }
                 });
 
+                // --- ЛОГИКА ПОБЕДЫ ---
                 if (this.state === 'playing' && !this.draggedNode && this.introFrames === 0 && this.hasInteracted) {
                     let isMoving = this.nodes.some(n => Math.abs(n.vx) > 0.5 || Math.abs(n.vy) > 0.5);
                     
@@ -2220,6 +2210,8 @@
                         this.sessionStreak++;
                         
                         let xpBase = 0;
+                        let justUnlockedNextMode = false;
+                        let nextModeObj = null;
                         
                         if (this.isDaily) {
                             this.player.daily.stagesCompleted++;
@@ -2227,17 +2219,28 @@
                                 this.player.daily.streak++;
                                 xpBase = 500; 
                                 document.getElementById('winTitle').innerText = 'Вызов Выполнен!';
-                                document.getElementById('winNextBtn').innerText = 'Вернуться в меню';
                             } else {
                                 xpBase = this.edges.length * 15;
                                 document.getElementById('winTitle').innerText = 'Этап пройден!';
-                                document.getElementById('winNextBtn').innerText = 'Следующий этап';
                             }
                         } else {
                             this.player.stats.levelsByMode[this.currentMode.id] = (this.player.stats.levelsByMode[this.currentMode.id] || 0) + 1;
                             xpBase = this.edges.length * 15 * this.levelNum;
+                            
+                            // ВАЖНО: Сразу увеличиваем и сохраняем прогресс уровня
+                            this.levelNum++;
+                            this.player.progress[this.currentMode.id] = this.levelNum;
+                            
                             document.getElementById('winTitle').innerText = 'Распутано!';
-                            document.getElementById('winNextBtn').innerText = 'Следующий уровень';
+                            
+                            // Проверяем, открыли ли мы новый режим (15 уровень)
+                            if (this.levelNum === 15) {
+                                let currentModeIdx = MODES.findIndex(m => m.id === this.currentMode.id);
+                                if (currentModeIdx >= 0 && currentModeIdx < MODES.length - 1) {
+                                    justUnlockedNextMode = true;
+                                    nextModeObj = MODES[currentModeIdx + 1];
+                                }
+                            }
                         }
                         
                         this.checkAchievements(timeTaken);
@@ -2255,7 +2258,7 @@
                                 vkBridge.send("VKWebAppShowNativeAds", { ad_format: "interstitial" }).catch(e => console.log('Ad error', e));
                             }
                         } else {
-                            this.savePlayer();
+                            this.savePlayer(); // Сохраняем весь прогресс
                         }
 
                         if (!this.player.notifAllowed) this.player.stats.levelsSinceNotifRefusal++;
@@ -2264,6 +2267,30 @@
                         setTimeout(() => {
                             document.getElementById('winStatsMsg').innerText = this.isDaily ? `Ежедневный вызов (${this.dailyStage}/3)` : `Сложность: ${this.currentMode.name}`;
                             document.getElementById('winXpMsg').innerText = `+${xpBase} XP` + (leveled ? ' (НОВЫЙ УРОВЕНЬ!)' : '');
+                            
+                            // Формируем кнопки экрана победы
+                            let btnHtml = '';
+                            if (justUnlockedNextMode && nextModeObj) {
+                                document.getElementById('winTitle').innerText = 'Новый этап открыт! 🔓';
+                                btnHtml = `
+                                    <button class="btn-primary btn-sfx" onclick="game.startGameById('${nextModeObj.id}')">Перейти: ${nextModeObj.name}</button>
+                                    <button class="w-full mt-2 py-3 bg-[#E2E8F0] dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-300 transition btn-sfx" onclick="game.startLevel()">Продолжить текущий</button>
+                                    <button class="w-full mt-2 py-2 text-slate-700 font-bold hover:text-slate-900 transition btn-sfx" onclick="game.showMenu()">В меню</button>
+                                `;
+                            } else {
+                                if (this.isDaily && this.player.daily.stagesCompleted >= 3) {
+                                    btnHtml = `<button class="btn-primary btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>`;
+                                } else {
+                                    let nextAction = this.isDaily ? 'game.startDaily()' : 'game.startLevel()';
+                                    let nextText = this.isDaily ? 'Следующий этап' : 'Следующий уровень';
+                                    btnHtml = `
+                                        <button class="btn-primary btn-sfx" onclick="${nextAction}">${nextText}</button>
+                                        <button class="w-full mt-4 py-3 text-slate-700 font-bold hover:text-slate-900 transition btn-sfx" onclick="game.showMenu()">Вернуться в меню</button>
+                                    `;
+                                }
+                            }
+                            
+                            document.getElementById('winBtnsContainer').innerHTML = btnHtml;
                             document.getElementById('winScreen').classList.add('active');
                         }, 200);
                     }
@@ -2308,7 +2335,7 @@
                         }
                     }
                     
-                    window.game.updateTheme(window.game.player.settings.theme || 'dark', true);
+                    window.game.updateTheme(window.game.player.settings.theme || 'light', true);
                     
                     if (!window.game.player.isPremium) {
                         vkBridge.send('VKWebAppShowBannerAd', { banner_location: 'bottom' })
